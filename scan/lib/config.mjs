@@ -119,3 +119,14 @@ export const NAVIGATION_METRICS = {
 };
 
 export const TIMESPAN_METRIC = 'interaction-to-next-paint';
+
+/**
+ * Where the interaction latency actually lives in a timespan.
+ *
+ * Lighthouse 12.8 leaves `interaction-to-next-paint` notApplicable in timespan
+ * mode even when the tap was recorded properly - the browser files event-timing
+ * entries with real interactionIds, the audit just does not consume them. This
+ * insight does, split into input delay, processing duration and presentation
+ * delay, and their sum is the same interaction latency.
+ */
+export const TIMESPAN_INSIGHT = 'inp-breakdown-insight';

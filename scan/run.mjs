@@ -40,6 +40,7 @@ import {
   timespanFlags,
   NAVIGATION_METRICS,
   TIMESPAN_METRIC,
+  TIMESPAN_INSIGHT,
   VIEWPORTS,
 } from './lib/config.mjs';
 import {
@@ -56,6 +57,8 @@ import { summarize, isoWeek } from './lib/stats.mjs';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const SAMPLES = Number(process.env.SAMPLES) || DEFAULT_SAMPLES;
+/** Held open after an interaction settles so its event timing can finalise. */
+const INTERACTION_DWELL_MS = 1_000;
 const WEEK = process.env.WEEK || isoWeek();
 const WRITE_REPORTS = process.env.NO_REPORTS !== '1';
 
@@ -211,6 +214,12 @@ async function runSample(browser, target, formFactor, sample) {
       });
       await press(page, trigger);
       await waitForSettle(page, interaction.settle, stepLabel);
+      // Settling means the sheet is on screen, which is marginally earlier than
+      // the presentation of the frame that completes the interaction. Holding
+      // the window open keeps that inside the trace and costs nothing: INP is
+      // the interaction's own latency, not the length of the window it was
+      // measured in.
+      await new Promise((resolve) => setTimeout(resolve, INTERACTION_DWELL_MS));
       await flow.endTimespan();
     }
 
@@ -244,15 +253,15 @@ function extract(flowResult, runContext, label) {
   const inp = {};
   for (const step of flowResult.steps) {
     if (step.lhr.gatherMode !== 'timespan') continue;
-    const audit = step.lhr.audits?.[TIMESPAN_METRIC];
-    if (typeof audit?.numericValue !== 'number') {
+    const value = timespanInp(step.lhr);
+    if (value == null) {
       // A 0 ms reading from an interaction that never happened is the one
       // outcome that would quietly invalidate the series.
       throw new Error(
         `${label}: "${step.name}" recorded no interaction - the click did not register`
       );
     }
-    inp[step.name] = audit.numericValue;
+    inp[step.name] = value;
   }
 
   return {
@@ -261,6 +270,28 @@ function extract(flowResult, runContext, label) {
     context: runContext,
     lighthouseVersion: navigation.lhr.lighthouseVersion,
   };
+}
+
+/**
+ * Interaction latency for one timespan, in ms, or null if nothing registered.
+ *
+ * The classic audit is tried first so this keeps working - and stays a single
+ * authoritative number - if a later Lighthouse starts populating it again in
+ * timespan mode. Today it does not, so the value comes from summing the INP
+ * insight's three subparts.
+ */
+function timespanInp(lhr) {
+  const direct = lhr.audits?.[TIMESPAN_METRIC]?.numericValue;
+  if (typeof direct === 'number') return direct;
+
+  const table = lhr.audits?.[TIMESPAN_INSIGHT]?.details?.items?.find(
+    (item) => item.type === 'table'
+  );
+  const subparts = table?.items ?? [];
+  if (subparts.length === 0) return null;
+
+  const total = subparts.reduce((sum, part) => sum + (part.duration ?? 0), 0);
+  return total > 0 ? total : null;
 }
 
 function aggregate(samples, errors) {
