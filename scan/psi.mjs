@@ -50,8 +50,18 @@ const STRATEGIES = { mobile: 'mobile', desktop: 'desktop' };
 const RETRIES = 3;
 /** PSI rate-limits per minute and occasionally 500s under load. */
 const RETRY_BACKOFF_MS = 15_000;
-/** Spacing between calls, well inside the per-minute quota. */
-const PACE_MS = 1_000;
+
+/**
+ * Minimum spacing between two calls for the same URL and strategy.
+ *
+ * PSI serves a cached report to a repeat request: five back-to-back calls came
+ * back byte-identical, sharing one analysisUTCTimestamp, which would have made
+ * the min/max band pure decoration. A repeat 90s later re-analysed. Samples are
+ * therefore taken in rounds - every URL once, then round again - so the gap is
+ * filled with useful work instead of sleeping, and this is only the floor that
+ * catches a run narrow enough that a round finishes too quickly.
+ */
+const MIN_GAP_MS = 95_000;
 
 const selectedTargets = filterBy(TARGETS, process.env.ONLY_TARGETS, (t) => t.id);
 const selectedFormFactors = filterBy(
@@ -74,6 +84,13 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
  * One PSI run. Retries transient failures - quota and 5xx - but not a refusal
  * to measure, which will not improve by asking again.
  */
+/**
+ * Enabling the API, or widening a key's restrictions, reaches Google's serving
+ * fleet unevenly for several minutes: calls fail with a 403 telling you to
+ * enable something that is already enabled, in between calls that succeed.
+ */
+const PROPAGATING = /has not been used in project|blocked|wait a few minutes/i;
+
 async function runPsi(url, strategy, label) {
   const query = new URLSearchParams({ url, strategy, category: 'performance' });
   if (API_KEY) query.set('key', API_KEY);
@@ -89,14 +106,19 @@ async function runPsi(url, strategy, label) {
       if (lhr.runtimeError?.code) {
         throw new Error(`${label}: ${lhr.runtimeError.code} - ${lhr.runtimeError.message}`);
       }
-      return lhr;
+      return { lhr, analysedAt: body.analysisUTCTimestamp ?? null };
     }
 
     lastError = body?.error?.message ?? `HTTP ${response.status}`;
-    const transient = response.status === 429 || response.status >= 500;
+    const transient =
+      response.status === 429 ||
+      response.status >= 500 ||
+      (response.status === 403 && PROPAGATING.test(lastError));
     if (!transient || attempt === RETRIES) break;
 
-    console.error(`[psi] ${label} attempt ${attempt} failed (${lastError}), retrying`);
+    console.error(
+      `[psi] ${label} attempt ${attempt} failed (${lastError.slice(0, 80)}), retrying`
+    );
     await sleep(RETRY_BACKOFF_MS * attempt);
   }
 
@@ -162,40 +184,67 @@ async function main() {
       `${selectedFormFactors.length} form factors x ${SAMPLES} samples`
   );
 
-  for (const target of selectedTargets) {
-    run.targets[target.id] = {
-      label: target.label,
-      url: target.url,
-      formFactors: {},
-    };
+  const combos = selectedTargets.flatMap((target) =>
+    selectedFormFactors.map((formFactor) => ({
+      key: `${target.id}/${formFactor}`,
+      target,
+      formFactor,
+      collected: [],
+      errors: [],
+    }))
+  );
 
-    for (const formFactor of selectedFormFactors) {
-      const label = `${target.id}/${formFactor}`;
-      const collected = [];
-      const errors = [];
+  const lastCallAt = new Map();
+  const lastAnalysedAt = new Map();
 
-      for (let sample = 1; sample <= SAMPLES; sample++) {
-        const sampleLabel = `${label} #${sample}`;
-        const t0 = Date.now();
-        try {
-          const lhr = await runPsi(target.url, STRATEGIES[formFactor], sampleLabel);
-          const metrics = extract(lhr, sampleLabel);
-          run.lighthouseVersion ??= lhr.lighthouseVersion ?? null;
-          collected.push(metrics);
-          console.log(
-            `[psi] ${sampleLabel} ok in ${Math.round((Date.now() - t0) / 1000)}s ` +
-              `(lcp ${Math.round(metrics.lcp)}ms, cls ${metrics.cls})`
-          );
-        } catch (error) {
-          errors.push({ sample, message: String(error?.message ?? error) });
-          console.error(`[psi] ${sampleLabel} FAILED: ${error?.message ?? error}`);
+  // Sample-major, so each URL is revisited only after every other one has been
+  // measured and its cached report has had time to expire.
+  for (let sample = 1; sample <= SAMPLES; sample++) {
+    for (const combo of combos) {
+      const sampleLabel = `${combo.key} #${sample}`;
+      const since = Date.now() - (lastCallAt.get(combo.key) ?? -Infinity);
+      if (since < MIN_GAP_MS) await sleep(MIN_GAP_MS - since);
+
+      const t0 = Date.now();
+      try {
+        const { lhr, analysedAt } = await runPsi(
+          combo.target.url,
+          STRATEGIES[combo.formFactor],
+          sampleLabel
+        );
+        lastCallAt.set(combo.key, Date.now());
+
+        // Timing alone is not proof the report is new, and a repeat of an
+        // earlier one would narrow the variance band rather than widen it -
+        // the failure would look like unusually stable performance.
+        if (analysedAt && analysedAt === lastAnalysedAt.get(combo.key)) {
+          throw new Error(`PSI returned its cached report from ${analysedAt}`);
         }
-        await sleep(PACE_MS);
-      }
+        lastAnalysedAt.set(combo.key, analysedAt);
 
-      if (collected.length === 0) failures.push(label);
-      run.targets[target.id].formFactors[formFactor] = aggregate(collected, errors);
+        const metrics = extract(lhr, sampleLabel);
+        run.lighthouseVersion ??= lhr.lighthouseVersion ?? null;
+        combo.collected.push(metrics);
+        console.log(
+          `[psi] ${sampleLabel} ok in ${Math.round((Date.now() - t0) / 1000)}s ` +
+            `(lcp ${Math.round(metrics.lcp)}ms, cls ${metrics.cls})`
+        );
+      } catch (error) {
+        lastCallAt.set(combo.key, Date.now());
+        combo.errors.push({ sample, message: String(error?.message ?? error) });
+        console.error(`[psi] ${sampleLabel} FAILED: ${error?.message ?? error}`);
+      }
     }
+  }
+
+  for (const combo of combos) {
+    const entry = (run.targets[combo.target.id] ??= {
+      label: combo.target.label,
+      url: combo.target.url,
+      formFactors: {},
+    });
+    if (combo.collected.length === 0) failures.push(combo.key);
+    entry.formFactors[combo.formFactor] = aggregate(combo.collected, combo.errors);
   }
 
   const minutes = ((Date.now() - startedAt) / 60_000).toFixed(1);

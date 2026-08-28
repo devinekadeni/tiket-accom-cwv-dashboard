@@ -1,0 +1,119 @@
+{
+  "week": "2026-W35",
+  "runAt": "2026-08-28T09:07:51.739Z",
+  "samples": 2,
+  "source": "pagespeed-insights",
+  "lighthouseVersion": "13.4.1",
+  "runner": {
+    "ci": "local",
+    "commit": null
+  },
+  "targets": {
+    "landing": {
+      "label": "Hotel landing",
+      "url": "https://www.tiket.com/id-id/hotel",
+      "formFactors": {
+        "mobile": {
+          "metrics": {
+            "lcp": {
+              "median": 7693,
+              "min": 7654,
+              "max": 7732,
+              "samples": 2
+            },
+            "cls": {
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "samples": 2
+            },
+            "fcp": {
+              "median": 2703,
+              "min": 2703,
+              "max": 2703,
+              "samples": 2
+            },
+            "ttfb": {
+              "median": 4,
+              "min": 3,
+              "max": 4,
+              "samples": 2
+            },
+            "tbt": {
+              "median": 1768,
+              "min": 1151,
+              "max": 2386,
+              "samples": 2
+            },
+            "speedIndex": {
+              "median": 7641,
+              "min": 6566,
+              "max": 8717,
+              "samples": 2
+            },
+            "perfScore": {
+              "median": 39,
+              "min": 35,
+              "max": 42,
+              "samples": 2
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 2,
+          "errors": []
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 1970,
+              "min": 1938,
+              "max": 2001,
+              "samples": 2
+            },
+            "cls": {
+              "median": 0.0088,
+              "min": 0.0088,
+              "max": 0.0088,
+              "samples": 2
+            },
+            "fcp": {
+              "median": 809,
+              "min": 809,
+              "max": 809,
+              "samples": 2
+            },
+            "ttfb": {
+              "median": 162,
+              "min": 124,
+              "max": 199,
+              "samples": 2
+            },
+            "tbt": {
+              "median": 923,
+              "min": 764,
+              "max": 1082,
+              "samples": 2
+            },
+            "speedIndex": {
+              "median": 2671,
+              "min": 2604,
+              "max": 2738,
+              "samples": 2
+            },
+            "perfScore": {
+              "median": 57,
+              "min": 55,
+              "max": 58,
+              "samples": 2
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 2,
+          "errors": []
+        }
+      }
+    }
+  }
+}
