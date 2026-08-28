@@ -30,9 +30,18 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { TARGETS } from './targets.mjs';
-import { NAVIGATION_METRICS } from './lib/config.mjs';
 import { summarize, runDate } from './lib/stats.mjs';
 import { assertLhrNotChallenged, assertLhrIsRequestedPage } from './lib/challenge.mjs';
+
+/** Metrics pulled from every report, in dashboard display order. */
+const NAVIGATION_METRICS = {
+  lcp: 'largest-contentful-paint',
+  cls: 'cumulative-layout-shift',
+  fcp: 'first-contentful-paint',
+  ttfb: 'server-response-time',
+  tbt: 'total-blocking-time',
+  speedIndex: 'speed-index',
+};
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ENDPOINT = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';

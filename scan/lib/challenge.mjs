@@ -8,50 +8,13 @@
  * The interstitial is a tiny self-contained document, so it produces numbers
  * that look excellent rather than obviously broken: the first CI run measured
  * ~400ms LCP and 0.001 CLS identically across the landing page, the SRP and the
- * PDP, with a 6ms TTFB, and committed all of it as real data.
+ * PDP, with a 6ms TTFB, and committed all of it as real data. This is the check
+ * that makes that fail loudly instead.
  *
- * Mobile catches this on its own, because the interaction trigger it needs is
- * missing, but desktop only navigates and so has nothing to trip over. This is
- * the check that makes it fail loudly on both.
+ * Moving the scan to PageSpeed Insights made a challenge far less likely -
+ * Google's crawlers are let through where a GitHub runner is not - but not
+ * impossible, and the cost of recording one silently has not changed.
  */
-
-/** Interstitial titles, in both languages the site serves them in. */
-const CHALLENGE_TITLE =
-  /just a moment|robot atau manusia|attention required|verifying you are human|sedang memverifikasi/i;
-
-/**
- * Markup Cloudflare injects for the challenge widget. Checked alongside the
- * title so a silent retitling does not defeat this on its own.
- */
-const CHALLENGE_MARKUP = [
-  '#challenge-form',
-  '#challenge-running',
-  '#cf-chl-widget',
-  'script[src*="challenge-platform"]',
-];
-
-/**
- * Throw unless the page really is the site.
- *
- * @param {import('puppeteer').Page} page
- * @param {string} label used in the error, e.g. "srp/desktop"
- */
-export async function assertNotChallenged(page, label) {
-  const state = await page.evaluate((selectors) => {
-    return {
-      title: document.title,
-      marker: selectors.find((selector) => document.querySelector(selector)) ?? null,
-    };
-  }, CHALLENGE_MARKUP);
-
-  if (CHALLENGE_TITLE.test(state.title) || state.marker) {
-    const reason = state.marker ? `matched ${state.marker}` : `title "${state.title}"`;
-    throw new Error(
-      `${label}: served a bot challenge instead of the page (${reason}) - ` +
-        `no measurement taken`
-    );
-  }
-}
 
 /** Requests only the interstitial makes; Cloudflare's other /cdn-cgi/ assets
  * appear on perfectly normal pages, so this must stay narrow. */
@@ -64,7 +27,7 @@ const CHALLENGE_REQUEST = /\/cdn-cgi\/challenge-platform\//i;
 const IMPLAUSIBLE_BYTES = 100_000;
 
 /**
- * The same guarantee for a result measured elsewhere.
+ * Throw unless the report is of the real page rather than an interstitial.
  *
  * PageSpeed Insights runs Lighthouse on Google's own machines, so there is no
  * live page left to inspect - only the report. The interstitial is still

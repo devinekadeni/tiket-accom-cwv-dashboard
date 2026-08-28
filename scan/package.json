@@ -8,11 +8,6 @@
   },
   "scripts": {
     "scan": "node psi.mjs",
-    "scan:local": "node run.mjs",
     "crux": "node crux.mjs"
-  },
-  "dependencies": {
-    "lighthouse": "^12.3.0",
-    "puppeteer": "^24.1.0"
   }
 }

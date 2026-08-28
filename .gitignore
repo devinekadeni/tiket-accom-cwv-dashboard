@@ -3,14 +3,15 @@ dist/
 .env
 .env.local
 
+# pnpm falls back to a store inside the repo when it cannot reach the usual one
+# in $HOME. Tens of thousands of files, and nothing that belongs in git.
+.pnpm-store/
+
 # Generated at build time from data/runs/*.json + data/crux.json, never committed.
 src/generated/
 
 # Fabricated preview data from `pnpm run sample`. Never real measurements.
 data/sample/
-
-# Full Lighthouse reports: uploaded as Actions artifacts, too large for git.
-reports/
 
 .DS_Store
 *.log

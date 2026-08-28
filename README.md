@@ -64,31 +64,25 @@ cards on a search results page, before it was caught.
 PSI runs the same Lighthouse from Google's infrastructure, which the site does admit. The cost is
 INP and the run context; navigation metrics are unaffected.
 
-Both paths now refuse to record a challenge screen: the live one checks the page before reading
-anything off it, and the PSI one checks the returned report for the challenge assets and for a
-page implausibly small to be the site.
+The scan refuses to record a challenge screen: it checks the returned report for the challenge
+assets and for a page implausibly small to be the site. It also refuses a report of the wrong
+page - a 4xx, or a redirect away from the URL asked for - since a delisted hotel would otherwise
+render at full weight and land in the trend as the PDP's own numbers.
 
-## The local harness
+## The removed harness
 
-`pnpm run scan:local` still drives a real browser and is the only way to get INP. It works
-whenever the challenge is not being served, which locally is most of the time. It is not in CI.
+A local Puppeteer harness used to drive a real browser through a scripted press on each page,
+which is what made INP and the run context measurable. It was deleted once PSI became the weekly
+source: keeping a second, unused measurement path in the tree only invited it to drift and be
+trusted later. `lighthouse` and `puppeteer` went with it, so the scan workspace now has no
+dependencies at all.
 
-Notes that apply only to it, all re-checkable with `node scan/verify.mjs`:
-
-- **Two app-install promos block every interaction.** A full-screen modal covers all three
-  targets on a cold session, and a floating CTA sits exactly on top of the PDP's "See rooms"
-  button. Both are dismissed after load and before measurement.
-- **The mobile UI ignores mouse clicks.** It binds touch handlers, so the harness taps.
-- **The SRP filter chip has no test id.** It is found by a scoped CSS-module prefix plus exact
-  text equality, because "Filter Populer" is a sibling. The label happens to be "Filter" in both
-  languages. Adding `data-testid="chip-filter"` upstream would retire this.
-- **The PDP renders two `button-see-room` elements**, one collapsed to 0x0. Element resolution
-  filters to visible matches and asserts exactly one.
-- **Lighthouse 12.8 does not populate `interaction-to-next-paint` in timespan mode** even when the
-  tap registers, so INP is read from `inp-breakdown-insight` instead. `scan/probe-inp.mjs` is the
-  instrumentation that established this, and distinguishes "the input never landed" from
-  "Lighthouse did not attribute it".
-- **Text selectors are locale-specific.** `node scan/probe-locale.mjs` prints the current strings.
+Its selector work is in git history rather than lost, along with what it took to make the pages
+scriptable - two app-install promos that intercept every tap, a mobile UI that ignores mouse
+clicks because it binds touch handlers, an SRP filter chip with no test id that needs exact text
+equality to separate it from "Filter Populer", and a PDP that renders two `button-see-room`
+elements, one collapsed to 0x0. One upstream change would retire most of that if a browser-driven
+scan ever becomes viable again: `data-testid` attributes on those controls.
 
 ## Accuracy caveats
 
@@ -113,19 +107,15 @@ Notes that apply only to it, all re-checkable with `node scan/verify.mjs`:
 pnpm install
 
 pnpm run scan          # PageSpeed Insights, ~30 min, needs an API key
-pnpm run scan:local    # real browser, ~20 min, adds INP, blocked when challenged
 pnpm run crux          # needs CRUX_API_KEY
 pnpm run dev           # dashboard against whatever is in data/
 pnpm run dev:sample    # dashboard against generated sample data
-
-node scan/verify.mjs   # selector probe for the local harness, no Lighthouse, ~90s
 ```
 
-Both scans take env overrides for quick iteration:
+The scan takes env overrides for quick iteration:
 
 ```bash
 SAMPLES=1 ONLY_TARGETS=srp ONLY_FORM_FACTORS=mobile PERIOD=test pnpm run scan
-HEADFUL=1 ONLY_TARGETS=srp node scan/verify.mjs
 ```
 
 `PERIOD` overrides the run's period id, which is otherwise the Jakarta calendar date. Use it for
