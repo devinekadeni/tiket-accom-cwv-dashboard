@@ -98,7 +98,20 @@ async function runPsi(url, strategy, label) {
   let lastError;
   for (let attempt = 1; attempt <= RETRIES; attempt++) {
     const response = await fetch(`${ENDPOINT}?${query}`);
-    const body = await response.json();
+
+    // Under load Google answers with an HTML error page rather than JSON, which
+    // would otherwise throw straight past the retry below and lose the sample.
+    const text = await response.text();
+    let body;
+    try {
+      body = JSON.parse(text);
+    } catch {
+      lastError = `non-JSON response (HTTP ${response.status})`;
+      if (attempt === RETRIES) break;
+      console.error(`[psi] ${label} attempt ${attempt} failed (${lastError}), retrying`);
+      await sleep(RETRY_BACKOFF_MS * attempt);
+      continue;
+    }
 
     if (response.ok) {
       const lhr = body.lighthouseResult;
