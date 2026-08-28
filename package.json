@@ -1,0 +1,33 @@
+{
+  "name": "tiket-accom-cwv-dashboard",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "rollup": "node scripts/rollup.mjs",
+    "dev": "pnpm run rollup && vite",
+    "sample": "node scripts/sample-data.mjs",
+    "dev:sample": "pnpm run sample && RUNS_DIR=data/sample/runs CRUX_PATH=data/sample/crux.json node scripts/rollup.mjs && vite",
+    "build": "pnpm run rollup && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "scan": "pnpm --filter cwv-scan run scan",
+    "crux": "pnpm --filter cwv-scan run crux"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.7.3",
+    "vite": "^6.0.7"
+  }
+}

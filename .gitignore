@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.env
+.env.local
+
+# Generated at build time from data/runs/*.json + data/crux.json, never committed.
+src/generated/
+
+# Fabricated preview data from `pnpm run sample`. Never real measurements.
+data/sample/
+
+# Full Lighthouse reports: uploaded as Actions artifacts, too large for git.
+reports/
+
+.DS_Store
+*.log
