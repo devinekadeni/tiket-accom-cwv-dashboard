@@ -52,6 +52,7 @@ import {
   dismissOverlays,
 } from './lib/interactions.mjs';
 import { attachContextCapture } from './lib/context.mjs';
+import { assertNotChallenged } from './lib/challenge.mjs';
 import { summarize, isoWeek } from './lib/stats.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -144,11 +145,20 @@ async function main() {
     await browser.close();
   }
 
+  const minutes = ((Date.now() - startedAt) / 60_000).toFixed(1);
   const runPath = path.join(REPO_ROOT, 'data', 'runs', `${WEEK}.json`);
+
+  // A partial week is worth keeping - the dashboard can show the gap - but a
+  // week where nothing succeeded is not a data point, and writing it would put
+  // an empty entry into the trend for the workflow to dutifully commit.
+  const total = selectedTargets.length * selectedFormFactors.length;
+  if (failures.length === total) {
+    console.error(`[scan] nothing succeeded in ${minutes} min, writing no run file`);
+    throw new Error(`no successful samples for: ${failures.join(', ')}`);
+  }
+
   await fs.mkdir(path.dirname(runPath), { recursive: true });
   await fs.writeFile(runPath, `${JSON.stringify(run, null, 2)}\n`);
-
-  const minutes = ((Date.now() - startedAt) / 60_000).toFixed(1);
   console.log(`[scan] wrote ${path.relative(REPO_ROOT, runPath)} in ${minutes} min`);
 
   if (process.env.GITHUB_OUTPUT) {
@@ -156,8 +166,7 @@ async function main() {
   }
 
   if (failures.length > 0) {
-    // Writing the file first means a partial week is still recorded and the
-    // dashboard can show the gap, but the workflow must still go red.
+    // The partial week has been recorded, but the workflow must still go red.
     throw new Error(`no successful samples for: ${failures.join(', ')}`);
   }
 }
@@ -182,6 +191,10 @@ async function runSample(browser, target, formFactor, sample) {
       ...navigationFlags(formFactor),
       name: 'load',
     });
+
+    // Before anything is read off the page, since a challenge interstitial
+    // measures as a fast, clean page rather than as a failure.
+    await assertNotChallenged(page, `${target.id}/${formFactor}`);
 
     const cards = target.context.cards
       ? await countCards(page, CARD_SELECTORS)
