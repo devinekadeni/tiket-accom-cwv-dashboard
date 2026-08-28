@@ -31,28 +31,19 @@ jobs:
           node-version: 20
           cache: pnpm
 
-      - name: Cache Puppeteer browser
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/puppeteer
-          key: puppeteer-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-
       - run: pnpm install --frozen-lockfile
 
-      # The runner image ships Chrome's dependencies, but a missing shared
-      # library would only surface as a 2am failure, so make it explicit.
-      - name: Install Chrome system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 \
-            libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2t64
-
+      # No browser is launched here: the scan asks PageSpeed Insights to run
+      # Lighthouse on Google's infrastructure, because this site's bot
+      # protection will not reliably let a runner's own browser load the pages.
+      #
       # continue-on-error so a partial week still gets committed, uploaded and
       # published. The job is failed explicitly at the end instead.
-      - name: Run Lighthouse scan
+      - name: Run Lighthouse scan via PageSpeed Insights
         id: scan
         continue-on-error: true
+        env:
+          CRUX_API_KEY: ${{ secrets.CRUX_API_KEY }}
         run: pnpm run scan
 
       - name: Fetch CrUX field data
@@ -73,18 +64,6 @@ jobs:
             git commit -m "data: ${{ steps.scan.outputs.week || 'weekly' }} scan"
             git push
           fi
-
-      # Full Lighthouse reports are 0.5-2 MB each; 30 a week would reach a
-      # gigabyte inside a year, so git holds only extracted metrics and the
-      # reports live here for 90 days.
-      - name: Upload Lighthouse reports
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lighthouse-reports-${{ steps.scan.outputs.week || github.run_id }}
-          path: reports/
-          retention-days: 90
-          if-no-files-found: warn
 
       - name: Build dashboard
         run: pnpm run build

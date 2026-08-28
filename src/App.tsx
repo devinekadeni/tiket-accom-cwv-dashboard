@@ -262,29 +262,35 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
       <div className="callout">
         <h2>How this data is collected</h2>
         <p>
-          Once a week a GitHub Actions runner drives a real headless Chrome through Lighthouse
-          against the three production URLs above, at a <strong>mobile</strong> preset
-          (390x844, slow 4G, 4x CPU slowdown) and a <strong>desktop</strong> one (1440x900,
-          dense 4G, no slowdown). Each page is loaded <strong>{samples} times</strong> per form
-          factor; the line is the median of those samples and the shaded band is the spread
-          from the fastest to the slowest, so a wide band means the page itself is
-          inconsistent rather than the measurement being wrong.
+          Once a week a GitHub Actions runner asks Google's PageSpeed Insights API to run
+          Lighthouse against the three production URLs above, at its <strong>mobile</strong>{' '}
+          preset (throttled phone on slow 4G) and its <strong>desktop</strong> one. Each page
+          is measured <strong>{samples} times</strong> per form factor; the line is the median
+          and the shaded band is the spread from fastest to slowest, so a wide band means the
+          page itself is inconsistent rather than the measurement being wrong. The bands here
+          are wide.
         </p>
         <p>
-          Page-load metrics come from Lighthouse navigation mode with simulated throttling, the
-          lowest-variance option and the reason a weekly line is signal rather than noise. INP
-          is different: it needs real event timings, so it is measured in timespan mode around
-          one scripted interaction per page - opening the destination autocomplete, the filter
-          sheet, the sort sheet, or a room list - with the CPU genuinely throttled 4x.
+          The scan does not drive a browser of its own. It used to, which is the more capable
+          approach - it can script a real press and so measure INP, and it can watch the page's
+          own network traffic for context like how long the search API took. But the site is
+          behind bot protection that intermittently serves an automated browser a challenge
+          screen instead of the page, and that screen measures as a very fast page rather than
+          as a failure. An entire week was published as roughly 400ms LCP across three
+          different pages before it was caught. Measuring from infrastructure the site admits
+          is worth losing INP for; the scan now also refuses outright to record anything that
+          looks like a challenge screen.
         </p>
         <p className="muted">
-          This is lab data: one scripted path, one vantage point, repeatable on purpose. It
-          catches regressions early and tells you which page and which interaction moved, but
-          it is not what your users experienced - the field tab is. Run context under each
-          chart records what the page actually returned that week, since a promo module
-          appearing can move CLS more than any code change. All three URLs are the Indonesian
-          (<code>/id-id/</code>) pages, which carry the bulk of real traffic; the English
-          equivalents behave differently and appear in the field tab for comparison.
+          This is lab data: Lighthouse run by Google's PageSpeed Insights against the live
+          pages, five samples each, plotted as the median with the spread behind it. One
+          scripted path, one vantage point, repeatable on purpose - it catches regressions
+          early and tells you which page moved, but it is not what your users experienced.
+          The field tab is. The spread is worth reading: repeat runs of the same page minutes
+          apart have differed by several seconds, so treat a single week's move with caution.
+          All three URLs are the Indonesian (<code>/id-id/</code>) pages, which carry the bulk
+          of real traffic; the English equivalents behave differently and appear in the field
+          tab for comparison.
         </p>
       </div>
 
@@ -299,22 +305,35 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
           <SummaryGrid rows={rows} weeks={weeks} />
 
           <h2>Interactions</h2>
-          <p className="muted">
-            Measured in Lighthouse timespan mode with the CPU throttled 4x - a scripted press on
-            one path, not the p75 of everything real users do. The field tab settles that.
-          </p>
-          <div className="charts">
-            {interactions.map((name) => (
-              <div key={name} className="chart-block">
-                <MetricChart
-                  def={{ ...INP_METRIC, label: `INP - ${name}` }}
-                  weeks={weeks}
-                  labels={labels}
-                  series={toChartSeries(rows, weeks, (series) => series.inp[name])}
-                />
+          {interactions.length === 0 ? (
+            <p className="muted">
+              Not measured here. INP needs a real press on a real control, and PageSpeed
+              Insights only loads a page - it cannot open the filter sheet or the room list.
+              Driving a browser ourselves can, but the site's bot protection refuses an
+              automated browser often enough that the measurement could not be relied on. Use
+              the field tab, where INP is the p75 of what users actually did.
+            </p>
+          ) : (
+            <>
+              <p className="muted">
+                Measured in Lighthouse timespan mode with the CPU throttled 4x - a scripted
+                press on one path, not the p75 of everything real users do. The field tab
+                settles that.
+              </p>
+              <div className="charts">
+                {interactions.map((name) => (
+                  <div key={name} className="chart-block">
+                    <MetricChart
+                      def={{ ...INP_METRIC, label: `INP - ${name}` }}
+                      weeks={weeks}
+                      labels={labels}
+                      series={toChartSeries(rows, weeks, (series) => series.inp[name])}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </>
+          )}
 
           <h2>Page load</h2>
           <div className="charts">
