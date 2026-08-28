@@ -92,3 +92,45 @@ export function assertLhrNotChallenged(lhr, label) {
     );
   }
 }
+
+/** Path only: query strings and trailing slashes are normalised by the site. */
+function pathOf(url) {
+  try {
+    return new URL(url).pathname.replace(/\/+$/, '');
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Throw unless the report is of the page that was asked for.
+ *
+ * The challenge checks above only prove that something substantial rendered.
+ * A hotel being delisted, or a region id changing under the SRP, gets a 404 or
+ * a redirect to the landing page - a full-weight render of the wrong page,
+ * which passes every check above and would be recorded as the target's own
+ * numbers. Nothing in the trend would look wrong; the PDP line would just step.
+ *
+ * @param {object} lhr a Lighthouse result
+ * @param {string} requestedUrl the URL the scan asked for
+ * @param {string} label used in the error, e.g. "pdp/mobile"
+ */
+export function assertLhrIsRequestedPage(lhr, requestedUrl, label) {
+  const requests = lhr?.audits?.['network-requests']?.details?.items ?? [];
+  const document = requests.find((item) => item.resourceType === 'Document');
+  const status = document?.statusCode;
+  if (typeof status === 'number' && status >= 400) {
+    throw new Error(
+      `${label}: ${requestedUrl} returned HTTP ${status} - the page is gone or ` +
+        `moved, no measurement taken`
+    );
+  }
+
+  const landed = pathOf(lhr?.finalDisplayedUrl ?? lhr?.finalUrl ?? '');
+  const asked = pathOf(requestedUrl);
+  if (landed && asked && landed !== asked) {
+    throw new Error(
+      `${label}: asked for ${asked} but landed on ${landed} - no measurement taken`
+    );
+  }
+}

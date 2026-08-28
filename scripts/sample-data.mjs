@@ -19,7 +19,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const OUT_DIR = path.resolve('data/sample');
-const WEEKS = 10;
+const RUNS = 20;
 const ORIGIN = 'https://www.tiket.com';
 
 const BASE = {
@@ -87,20 +87,29 @@ function spread(median, noise, decimals) {
   return { median: round(median), min: round(low), max: round(high), samples: 5 };
 }
 
-const isoWeek = (index) => `2026-W${String(24 + index).padStart(2, '0')}`;
+/**
+ * Run dates, two per week, mirroring the real schedule: the Tuesday and Friday
+ * mornings after the team's Monday and Thursday deploys. Index 0 is Tue 16 Jun
+ * 2026.
+ */
+const runPeriod = (index) => {
+  const start = Date.UTC(2026, 5, 16);
+  const offset = Math.floor(index / 2) * 7 + (index % 2) * 3;
+  return new Date(start + offset * 86_400_000).toISOString().slice(0, 10);
+};
 
 await fs.rm(OUT_DIR, { recursive: true, force: true });
 await fs.mkdir(path.join(OUT_DIR, 'runs'), { recursive: true });
 
-for (let i = 0; i < WEEKS; i++) {
+for (let i = 0; i < RUNS; i++) {
   // A promo campaign runs for three weeks in the middle. It inflates SRP layout
   // shift, which is the whole reason the run context is recorded - otherwise it
   // reads as a code regression.
-  const promoWeek = i >= 4 && i <= 6;
+  const promoRun = i >= 8 && i <= 13;
   // The filter sheet degrades steadily over the last few weeks, which is the
-  // kind of drift a weekly trend is meant to surface.
-  const filterDrift = 1 + Math.max(0, i - 3) * 0.11;
-  const failedSample = i === 7;
+  // kind of drift the trend is meant to surface.
+  const filterDrift = 1 + Math.max(0, i - 7) * 0.055;
+  const failedSample = i === 15;
 
   const targets = {};
   for (const [id, base] of Object.entries(BASE)) {
@@ -113,7 +122,7 @@ for (let i = 0; i < WEEKS; i++) {
       const metrics = {};
       for (const [key, value] of Object.entries(source.metrics)) {
         let scaled = value * wobble();
-        if (key === 'cls' && promoWeek && id === 'srp') scaled *= 1.45;
+        if (key === 'cls' && promoRun && id === 'srp') scaled *= 1.45;
         if (key === 'lcp' && id === 'srp') scaled *= 0.9 + random() * 0.25;
         if (key === 'perfScore') scaled = Math.min(100, scaled);
         metrics[key] = spread(scaled, key === 'lcp' ? 0.22 : 0.09, key === 'cls' ? 4 : 0);
@@ -133,14 +142,14 @@ for (let i = 0; i < WEEKS; i++) {
           searchApiMs:
             source.context.searchApiMs == null
               ? null
-              : spread(source.context.searchApiMs * (promoWeek ? 1.3 : 1) * wobble(), 0.25, 0),
+              : spread(source.context.searchApiMs * (promoRun ? 1.3 : 1) * wobble(), 0.25, 0),
           searchApiUrl:
             source.context.searchApiMs == null
               ? null
               : `www.tiket.com/ms-gateway/tix-hotel-search/${id === 'srp' ? 'v4/search' : 'v3/room'}`,
           overlays: formFactor === 'mobile' ? ['app-install-modal', 'app-install-floating-cta'] : null,
-          hasPromo: id === 'pdp' ? null : promoWeek,
-          pageModules: id === 'pdp' ? null : promoWeek ? ['FLASH_SALE'] : ['TIXHOTEL'],
+          hasPromo: id === 'pdp' ? null : promoRun,
+          pageModules: id === 'pdp' ? null : promoRun ? ['FLASH_SALE'] : ['TIXHOTEL'],
           slowestXhr: [],
         },
         sampleCount: failedSample && formFactor === 'mobile' ? 4 : 5,
@@ -155,7 +164,7 @@ for (let i = 0; i < WEEKS; i++) {
   }
 
   const run = {
-    week: isoWeek(i),
+    period: runPeriod(i),
     runAt: new Date(Date.UTC(2026, 5, 8 + i * 7, 2, 4, 0)).toISOString(),
     samples: 5,
     lighthouseVersion: '12.8.2',
@@ -165,7 +174,7 @@ for (let i = 0; i < WEEKS; i++) {
   };
 
   await fs.writeFile(
-    path.join(OUT_DIR, 'runs', `${run.week}.json`),
+    path.join(OUT_DIR, 'runs', `${run.period}.json`),
     `${JSON.stringify(run, null, 2)}\n`
   );
 }
@@ -301,4 +310,4 @@ await fs.writeFile(
   )}\n`
 );
 
-console.log(`[sample] wrote ${WEEKS} weeks + CrUX to data/sample/ (gitignored, not real data)`);
+console.log(`[sample] wrote ${RUNS} runs + CrUX to data/sample/ (gitignored, not real data)`);

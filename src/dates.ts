@@ -1,7 +1,8 @@
 /**
- * Period ids come in two shapes: ISO week ids from the lab runs ("2026-W33")
- * and calendar days from CrUX ("2026-08-10"). Both are turned into dates here
- * so the charts can show something a human reads as a date.
+ * Period ids are calendar days ("2026-08-10") for both the lab runs and CrUX,
+ * turned into dates here so the charts can show something a human reads as a
+ * date. ISO week ids ("2026-W33") are still accepted because the lab used them
+ * until the scan went twice-weekly, and a fork may still hold such a file.
  */
 
 const MONTHS = [

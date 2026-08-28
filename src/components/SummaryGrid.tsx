@@ -10,12 +10,12 @@ type Row = {
 
 type Props = {
   rows: Row[];
-  /** The weeks currently in range, oldest first. */
-  weeks: string[];
+  /** The periods currently in range, oldest first. */
+  periods: string[];
 };
 
 /** Latest run per series: value, delta against the previous run, and pass/fail. */
-export function SummaryGrid({ rows, weeks }: Props) {
+export function SummaryGrid({ rows, periods }: Props) {
   const interactions = [...new Set(rows.flatMap((row) => Object.keys(row.series.inp)))].sort();
 
   return (
@@ -44,10 +44,10 @@ export function SummaryGrid({ rows, weeks }: Props) {
                 {row.label}
               </th>
               {LAB_METRICS.map((def) => (
-                <Cell key={def.key} def={def} points={row.series.metrics[def.key]} weeks={weeks} />
+                <Cell key={def.key} def={def} points={row.series.metrics[def.key]} periods={periods} />
               ))}
               {interactions.map((name) => (
-                <Cell key={name} def={INP_METRIC} points={row.series.inp[name]} weeks={weeks} />
+                <Cell key={name} def={INP_METRIC} points={row.series.inp[name]} periods={periods} />
               ))}
             </tr>
           ))}
@@ -60,15 +60,15 @@ export function SummaryGrid({ rows, weeks }: Props) {
 function Cell({
   def,
   points,
-  weeks,
+  periods,
 }: {
   def: Pick<MetricDef, 'unit' | 'good' | 'poor' | 'higherIsBetter'>;
   points?: Point[];
-  weeks: string[];
+  periods: string[];
 }) {
-  const byWeek = new Map((points ?? []).map((point) => [point.week, point]));
-  const latest = byWeek.get(weeks[weeks.length - 1] ?? '')?.median ?? null;
-  const previous = byWeek.get(weeks[weeks.length - 2] ?? '')?.median ?? null;
+  const byPeriod = new Map((points ?? []).map((point) => [point.period, point]));
+  const latest = byPeriod.get(periods[periods.length - 1] ?? '')?.median ?? null;
+  const previous = byPeriod.get(periods[periods.length - 2] ?? '')?.median ?? null;
 
   if (latest == null) return <td className="cell-empty">-</td>;
 

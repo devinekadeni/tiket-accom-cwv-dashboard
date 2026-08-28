@@ -14,7 +14,7 @@
  *   SAMPLES=5            samples per target per form factor
  *   ONLY_TARGETS=srp,pdp restrict to these target ids
  *   ONLY_FORM_FACTORS=mobile
- *   WEEK=2026-09-01     override the derived run date
+ *   PERIOD=2026-09-01     override the derived run date
  *   HEADFUL=1            watch the browser
  *   NO_REPORTS=1         skip HTML report generation
  */
@@ -60,7 +60,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 const SAMPLES = Number(process.env.SAMPLES) || DEFAULT_SAMPLES;
 /** Held open after an interaction settles so its event timing can finalise. */
 const INTERACTION_DWELL_MS = 1_000;
-const WEEK = process.env.WEEK || runDate();
+const PERIOD = process.env.PERIOD || runDate();
 const WRITE_REPORTS = process.env.NO_REPORTS !== '1';
 
 const selectedTargets = filterBy(TARGETS, process.env.ONLY_TARGETS, (t) => t.id);
@@ -73,7 +73,7 @@ const selectedFormFactors = filterBy(
 async function main() {
   const startedAt = Date.now();
   console.log(
-    `[scan] run ${WEEK}, ${selectedTargets.length} targets x ` +
+    `[scan] run ${PERIOD}, ${selectedTargets.length} targets x ` +
       `${selectedFormFactors.length} form factors x ${SAMPLES} samples`
   );
 
@@ -89,7 +89,7 @@ async function main() {
   });
 
   const run = {
-    week: WEEK,
+    period: PERIOD,
     runAt: new Date().toISOString(),
     samples: SAMPLES,
     lighthouseVersion: null,
@@ -146,10 +146,10 @@ async function main() {
   }
 
   const minutes = ((Date.now() - startedAt) / 60_000).toFixed(1);
-  const runPath = path.join(REPO_ROOT, 'data', 'runs', `${WEEK}.json`);
+  const runPath = path.join(REPO_ROOT, 'data', 'runs', `${PERIOD}.json`);
 
-  // A partial week is worth keeping - the dashboard can show the gap - but a
-  // week where nothing succeeded is not a data point, and writing it would put
+  // A partial run is worth keeping - the dashboard can show the gap - but a
+  // run where nothing succeeded is not a data point, and writing it would put
   // an empty entry into the trend for the workflow to dutifully commit.
   const total = selectedTargets.length * selectedFormFactors.length;
   if (failures.length === total) {
@@ -162,11 +162,11 @@ async function main() {
   console.log(`[scan] wrote ${path.relative(REPO_ROOT, runPath)} in ${minutes} min`);
 
   if (process.env.GITHUB_OUTPUT) {
-    await fs.appendFile(process.env.GITHUB_OUTPUT, `week=${WEEK}\n`);
+    await fs.appendFile(process.env.GITHUB_OUTPUT, `period=${PERIOD}\n`);
   }
 
   if (failures.length > 0) {
-    // The partial week has been recorded, but the workflow must still go red.
+    // The partial run has been recorded, but the workflow must still go red.
     throw new Error(`no successful samples for: ${failures.join(', ')}`);
   }
 }
@@ -345,7 +345,7 @@ async function writeReport(flowResult, target, formFactor, sample) {
   const { ReportGenerator } = await import(
     'lighthouse/report/generator/report-generator.js'
   );
-  const dir = path.join(REPO_ROOT, 'reports', WEEK);
+  const dir = path.join(REPO_ROOT, 'reports', PERIOD);
   await fs.mkdir(dir, { recursive: true });
   await fs.writeFile(
     path.join(dir, `${target.id}-${formFactor}-${sample}.html`),

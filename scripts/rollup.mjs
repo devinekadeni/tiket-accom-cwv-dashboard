@@ -3,8 +3,8 @@
  * Build-time rollup: data/runs/*.json + data/crux.json -> src/generated/history.json.
  *
  * The aggregate is generated, never committed. Rewriting one growing file every
- * week would put a full copy of it into git history each time, which is the one
- * way this storage model could actually get expensive; the per-week run files
+ * run would put a full copy of it into git history each time, which is the one
+ * way this storage model could actually get expensive; the per-run files
  * are append-only and a few KB each.
  *
  * The dashboard imports the output statically, so there is no runtime fetch, no
@@ -20,7 +20,7 @@ const OUT_PATH = path.join(REPO_ROOT, 'src', 'generated', 'history.json');
 
 // Overridable so `dev:sample` can point at throwaway data. Keeping sample runs
 // out of data/runs/ matters: the workflow commits that directory wholesale, and
-// fabricated weeks landing in the real history would be hard to spot later.
+// fabricated runs landing in the real history would be hard to spot later.
 const RUNS_DIR = path.resolve(REPO_ROOT, process.env.RUNS_DIR ?? 'data/runs');
 const CRUX_PATH = path.resolve(REPO_ROOT, process.env.CRUX_PATH ?? 'data/crux.json');
 
@@ -29,8 +29,8 @@ const METRIC_KEYS = ['lcp', 'cls', 'fcp', 'ttfb', 'tbt', 'speedIndex', 'perfScor
 const runs = await readRuns();
 const history = {
   generatedAt: new Date().toISOString(),
-  weeks: runs.map((run) => ({
-    week: run.week,
+  runs: runs.map((run) => ({
+    period: run.period,
     runAt: run.runAt,
     lighthouseVersion: run.lighthouseVersion ?? null,
     samples: run.samples ?? null,
@@ -65,8 +65,8 @@ async function readRuns() {
   }
   // Period ids are YYYY-MM-DD, which sorts lexicographically into chronological
   // order. They were ISO week ids until the scan started running twice a week,
-  // when a second run would have overwritten the first week's file.
-  return parsed.sort((a, b) => a.week.localeCompare(b.week));
+  // when a second run would have overwritten the first one's file.
+  return parsed.sort((a, b) => a.period.localeCompare(b.period));
 }
 
 function collectTargets(runs) {
@@ -80,7 +80,7 @@ function collectTargets(runs) {
 }
 
 /**
- * One series per target x form factor, each metric a week-indexed array. Weeks
+ * One series per target x form factor, each metric a period-indexed array. Periods
  * a target did not produce become null so the chart draws a gap rather than
  * interpolating across a failed run.
  */
@@ -95,26 +95,26 @@ function buildSeries(runs) {
   }
 
   return [...keys.values()].map(({ targetId, formFactor }) => {
-    const perWeek = runs.map((run) => ({
-      week: run.week,
+    const perPeriod = runs.map((run) => ({
+      period: run.period,
       data: run.targets?.[targetId]?.formFactors?.[formFactor] ?? null,
     }));
 
     const metrics = {};
     for (const key of METRIC_KEYS) {
-      metrics[key] = perWeek.map(({ week, data }) => point(week, data?.metrics?.[key]));
+      metrics[key] = perPeriod.map(({ period, data }) => point(period, data?.metrics?.[key]));
     }
 
     const interactionNames = new Set(
-      perWeek.flatMap(({ data }) => Object.keys(data?.inp ?? {}))
+      perPeriod.flatMap(({ data }) => Object.keys(data?.inp ?? {}))
     );
     const inp = {};
     for (const name of interactionNames) {
-      inp[name] = perWeek.map(({ week, data }) => point(week, data?.inp?.[name]));
+      inp[name] = perPeriod.map(({ period, data }) => point(period, data?.inp?.[name]));
     }
 
-    const context = perWeek.map(({ week, data }) => ({
-      week,
+    const context = perPeriod.map(({ period, data }) => ({
+      period,
       cards: data?.context?.cards?.median ?? null,
       searchApiMs: data?.context?.searchApiMs?.median ?? null,
       hasPromo: data?.context?.hasPromo ?? null,
@@ -128,9 +128,9 @@ function buildSeries(runs) {
   });
 }
 
-function point(week, summary) {
-  if (!summary) return { week, median: null, min: null, max: null };
-  return { week, median: summary.median, min: summary.min, max: summary.max };
+function point(period, summary) {
+  if (!summary) return { period, median: null, min: null, max: null };
+  return { period, median: summary.median, min: summary.min, max: summary.max };
 }
 
 /**

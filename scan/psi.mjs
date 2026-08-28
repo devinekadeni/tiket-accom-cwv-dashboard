@@ -21,11 +21,8 @@
  *   PSI_API_KEY=... node scan/psi.mjs
  *   SAMPLES=1 ONLY_TARGETS=srp node scan/psi.mjs
  *
- * Writes data/runs/<date>.json in the same shape the local harness wrote, so
- * the rollup and dashboard are unchanged. The `week` field in that file holds
- * the run's period id, which is now a date rather than an ISO week - the name
- * predates the schedule change and is kept only to avoid renaming it through
- * the rollup, the types and every chart in one go.
+ * Writes data/runs/<date>.json, keyed by `period` - the Jakarta calendar date
+ * of the run - in the same shape the local harness writes.
  */
 
 import fs from 'node:fs/promises';
@@ -35,7 +32,7 @@ import { fileURLToPath } from 'node:url';
 import { TARGETS } from './targets.mjs';
 import { NAVIGATION_METRICS } from './lib/config.mjs';
 import { summarize, runDate } from './lib/stats.mjs';
-import { assertLhrNotChallenged } from './lib/challenge.mjs';
+import { assertLhrNotChallenged, assertLhrIsRequestedPage } from './lib/challenge.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ENDPOINT = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
@@ -45,7 +42,7 @@ const ENDPOINT = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 const API_KEY = process.env.PSI_API_KEY || process.env.CRUX_API_KEY;
 
 const SAMPLES = Number(process.env.SAMPLES) || 5;
-const WEEK = process.env.WEEK || runDate();
+const PERIOD = process.env.PERIOD || runDate();
 
 /** PSI's own name for each form factor. */
 const STRATEGIES = { mobile: 'mobile', desktop: 'desktop' };
@@ -142,8 +139,9 @@ async function runPsi(url, strategy, label) {
 }
 
 /** Pull the metrics the dashboard charts out of a Lighthouse result. */
-function extract(lhr, label) {
+function extract(lhr, url, label) {
   assertLhrNotChallenged(lhr, label);
+  assertLhrIsRequestedPage(lhr, url, label);
 
   const metrics = {};
   for (const [key, auditId] of Object.entries(NAVIGATION_METRICS)) {
@@ -182,7 +180,7 @@ async function main() {
 
   const startedAt = Date.now();
   const run = {
-    week: WEEK,
+    period: PERIOD,
     runAt: new Date().toISOString(),
     samples: SAMPLES,
     source: 'pagespeed-insights',
@@ -196,7 +194,7 @@ async function main() {
 
   const failures = [];
   console.log(
-    `[psi] run ${WEEK}, ${selectedTargets.length} targets x ` +
+    `[psi] run ${PERIOD}, ${selectedTargets.length} targets x ` +
       `${selectedFormFactors.length} form factors x ${SAMPLES} samples`
   );
 
@@ -238,7 +236,7 @@ async function main() {
         }
         lastAnalysedAt.set(combo.key, analysedAt);
 
-        const metrics = extract(lhr, sampleLabel);
+        const metrics = extract(lhr, combo.target.url, sampleLabel);
         run.lighthouseVersion ??= lhr.lighthouseVersion ?? null;
         combo.collected.push(metrics);
         console.log(
@@ -264,7 +262,7 @@ async function main() {
   }
 
   const minutes = ((Date.now() - startedAt) / 60_000).toFixed(1);
-  const runPath = path.join(REPO_ROOT, 'data', 'runs', `${WEEK}.json`);
+  const runPath = path.join(REPO_ROOT, 'data', 'runs', `${PERIOD}.json`);
 
   // A partial run is a data point with a gap in it; a run where nothing
   // succeeded is not a data point, and committing it would put an empty entry
@@ -280,7 +278,7 @@ async function main() {
   console.log(`[psi] wrote ${path.relative(REPO_ROOT, runPath)} in ${minutes} min`);
 
   if (process.env.GITHUB_OUTPUT) {
-    await fs.appendFile(process.env.GITHUB_OUTPUT, `week=${WEEK}\n`);
+    await fs.appendFile(process.env.GITHUB_OUTPUT, `period=${PERIOD}\n`);
   }
 
   if (failures.length > 0) {

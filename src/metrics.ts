@@ -30,7 +30,7 @@ export const LAB_METRICS: MetricDef[] = [
     unit: 'unitless',
     good: 0.1,
     poor: 0.25,
-    note: 'Highly sensitive to which promo modules the page returned that week.',
+    note: 'Highly sensitive to which promo modules the page returned that run.',
   },
   {
     key: 'fcp',

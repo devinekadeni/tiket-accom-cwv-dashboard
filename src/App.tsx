@@ -73,11 +73,11 @@ export default function App() {
     return [...byTarget.values()];
   }, [decorated, targets]);
 
-  const allWeeks = useMemo(() => history.weeks.map((w) => w.week), []);
-  const weeks = useMemo(() => filterPeriods(allWeeks, range), [allWeeks, range]);
+  const allPeriods = useMemo(() => history.runs.map((w) => w.period), []);
+  const periods = useMemo(() => filterPeriods(allPeriods, range), [allPeriods, range]);
   // Built over every period, not the filtered ones, so the masthead can still
   // name the latest run when the current filter excludes it.
-  const labels = useMemo(() => buildPeriodLabels(allWeeks), [allWeeks]);
+  const labels = useMemo(() => buildPeriodLabels(allPeriods), [allPeriods]);
 
   const cruxPeriods = useMemo(
     () =>
@@ -94,11 +94,11 @@ export default function App() {
   );
 
   const visible = decorated.filter((row) => !hidden.has(row.key));
-  const latest = history.weeks.at(-1);
+  const latest = history.runs.at(-1);
 
   const rangeSummary =
     tab === 'lab'
-      ? `${weeks.length} of ${allWeeks.length} scans`
+      ? `${periods.length} of ${allPeriods.length} scans`
       : `${filterPeriods(cruxPeriods, range).length} of ${cruxPeriods.length} windows`;
 
   function toggle(key: string) {
@@ -121,7 +121,7 @@ export default function App() {
             {latest && (
               <>
                 Latest run{' '}
-                <strong>{labels.full(latest.week)}</strong> with Lighthouse{' '}
+                <strong>{labels.full(latest.period)}</strong> with Lighthouse{' '}
                 {latest.lighthouseVersion}.
               </>
             )}
@@ -158,17 +158,17 @@ export default function App() {
         value={range}
         onChange={setRange}
         summary={rangeSummary}
-        bounds={dataBounds(tab === 'lab' ? allWeeks : cruxPeriods)}
+        bounds={dataBounds(tab === 'lab' ? allPeriods : cruxPeriods)}
       />
 
       {tab === 'lab' ? (
-        allWeeks.length === 0 ? (
+        allPeriods.length === 0 ? (
           <p className="empty">
             No runs yet. Trigger the <code>cwv-scan</code> workflow to record the first one.
           </p>
         ) : (
           <LabTab
-            weeks={weeks}
+            periods={periods}
             labels={labels}
             rows={visible}
             groups={groups}
@@ -185,7 +185,7 @@ export default function App() {
         <p>
           Measured from a GitHub Actions runner in the US/Europe against an origin served from
           South-East Asia, so absolute values read higher than they would locally. The
-          week-over-week trend is the meaningful part, since the vantage point is constant.
+          run-to-run trend is the meaningful part, since the vantage point is constant.
         </p>
         <p className="muted">Generated {new Date(history.generatedAt).toLocaleString()}.</p>
       </footer>
@@ -205,7 +205,7 @@ type SeriesRow = { key: string; label: string; color: string; series: Series };
 type TargetGroup = { id: string; label: string; url: string; rows: SeriesRow[] };
 
 type LabProps = {
-  weeks: string[];
+  periods: string[];
   labels: PeriodLabels;
   rows: SeriesRow[];
   groups: TargetGroup[];
@@ -214,7 +214,7 @@ type LabProps = {
   samples: number;
 };
 
-function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabProps) {
+function LabTab({ periods, labels, rows, groups, hidden, onToggle, samples }: LabProps) {
   const interactions = [...new Set(rows.flatMap((row) => Object.keys(row.series.inp)))].sort();
 
   const contextRows = rows.map((row) => ({
@@ -279,7 +279,7 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
           own network traffic for context like how long the search API took. But the site is
           behind bot protection that intermittently serves an automated browser a challenge
           screen instead of the page, and that screen measures as a very fast page rather than
-          as a failure. An entire week was published as roughly 400ms LCP across three
+          as a failure. An entire run was published as roughly 400ms LCP across three
           different pages before it was caught. Measuring from infrastructure the site admits
           is worth losing INP for; the scan now also refuses outright to record anything that
           looks like a challenge screen.
@@ -290,14 +290,14 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
           scripted path, one vantage point, repeatable on purpose - it catches regressions
           early and tells you which page moved, but it is not what your users experienced.
           The field tab is. The spread is worth reading: repeat runs of the same page minutes
-          apart have differed by several seconds, so treat a single week's move with caution.
+          apart have differed by several seconds, so treat a single run's move with caution.
           All three URLs are the Indonesian (<code>/id-id/</code>) pages, which carry the bulk
           of real traffic; the English equivalents behave differently and appear in the field
           tab for comparison.
         </p>
       </div>
 
-      {weeks.length === 0 ? (
+      {periods.length === 0 ? (
         <p className="empty">No scans in the selected range. Widen the date filter.</p>
       ) : (
         <>
@@ -306,7 +306,7 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
             Value, change from the previous run, and rating against Google's thresholds. Runs
             sit either side of a deploy window, so a change here contains one deploy.
           </p>
-          <SummaryGrid rows={rows} weeks={weeks} />
+          <SummaryGrid rows={rows} periods={periods} />
 
           <h2>Interactions</h2>
           {interactions.length === 0 ? (
@@ -329,9 +329,9 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
                   <div key={name} className="chart-block">
                     <MetricChart
                       def={{ ...INP_METRIC, label: `INP - ${name}` }}
-                      weeks={weeks}
+                      periods={periods}
                       labels={labels}
-                      series={toChartSeries(rows, weeks, (series) => series.inp[name])}
+                      series={toChartSeries(rows, periods, (series) => series.inp[name])}
                     />
                   </div>
                 ))}
@@ -345,11 +345,11 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
               <div key={def.key} className="chart-block">
                 <MetricChart
                   def={def}
-                  weeks={weeks}
+                  periods={periods}
                   labels={labels}
-                  series={toChartSeries(rows, weeks, (series) => series.metrics[def.key])}
+                  series={toChartSeries(rows, periods, (series) => series.metrics[def.key])}
                 />
-                <ContextStrip weeks={weeks} rows={contextRows} labels={labels} />
+                <ContextStrip periods={periods} rows={contextRows} labels={labels} />
               </div>
             ))}
           </div>
@@ -372,16 +372,16 @@ function shortUrl(url: string): string {
 
 function toChartSeries(
   rows: LabProps['rows'],
-  weeks: string[],
+  periods: string[],
   pick: (series: Series) => Series['metrics'][keyof Series['metrics']] | undefined
 ): ChartSeries[] {
-  const inRange = new Set(weeks);
+  const inRange = new Set(periods);
   return rows
     .map((row) => ({
       key: row.key,
       label: row.label,
       color: row.color,
-      points: (pick(row.series) ?? []).filter((point) => inRange.has(point.week)),
+      points: (pick(row.series) ?? []).filter((point) => inRange.has(point.period)),
     }))
     .filter((s) => s.points.some((p) => p?.median != null));
 }

@@ -76,7 +76,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "no data changes to commit"
           else
-            git commit -m "data: ${{ steps.scan.outputs.week || 'unknown' }} scan"
+            git commit -m "data: ${{ steps.scan.outputs.period || 'unknown' }} scan"
             git push
           fi
 

@@ -1,7 +1,7 @@
 /** Shape of src/generated/history.json, produced by scripts/rollup.mjs. */
 
 export type Point = {
-  week: string;
+  period: string;
   median: number | null;
   min: number | null;
   max: number | null;
@@ -18,8 +18,8 @@ export type MetricKey =
 
 export type FormFactor = 'mobile' | 'desktop';
 
-export type WeekMeta = {
-  week: string;
+export type RunMeta = {
+  period: string;
   runAt: string;
   lighthouseVersion: string | null;
   samples: number | null;
@@ -39,7 +39,7 @@ export type TargetMeta = {
 };
 
 export type ContextPoint = {
-  week: string;
+  period: string;
   cards: number | null;
   searchApiMs: number | null;
   hasPromo: boolean | null;
@@ -85,7 +85,7 @@ export type Crux = {
 
 export type History = {
   generatedAt: string;
-  weeks: WeekMeta[];
+  runs: RunMeta[];
   targets: TargetMeta[];
   series: Series[];
   crux: Crux;

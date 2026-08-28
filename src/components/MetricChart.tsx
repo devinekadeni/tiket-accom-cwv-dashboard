@@ -24,7 +24,7 @@ export type ChartSeries = {
 
 type Props = {
   def: Pick<MetricDef, 'label' | 'unit' | 'good' | 'poor' | 'higherIsBetter' | 'note'>;
-  weeks: string[];
+  periods: string[];
   series: ChartSeries[];
   labels: PeriodLabels;
 };
@@ -33,20 +33,20 @@ type Props = {
 export const CHART_LEFT_INSET = AXIS_WIDTH + 8;
 export const CHART_RIGHT_INSET = 16;
 
-export function MetricChart({ def, weeks, series, labels }: Props) {
-  // Keyed by week rather than positional, so a filtered week list cannot
+export function MetricChart({ def, periods, series, labels }: Props) {
+  // Keyed by period rather than positional, so a filtered period list cannot
   // silently shift a series against the axis.
-  const byWeek = new Map(
-    series.map((s) => [s.key, new Map(s.points.map((point) => [point.week, point]))])
+  const byPeriod = new Map(
+    series.map((s) => [s.key, new Map(s.points.map((point) => [point.period, point]))])
   );
 
-  const rows = weeks.map((week) => {
-    const row: Record<string, unknown> = { week };
+  const rows = periods.map((period) => {
+    const row: Record<string, unknown> = { period };
     for (const s of series) {
-      const point = byWeek.get(s.key)?.get(week);
+      const point = byPeriod.get(s.key)?.get(period);
       row[s.key] = point?.median ?? null;
       // Recharts draws a band when the value is a [low, high] pair. This is the
-      // spread across the week's samples, not a confidence interval - LCP here
+      // spread across the period's samples, not a confidence interval - LCP here
       // inherits the search API's variance, and a bare median would imply a
       // precision the measurement does not have.
       row[`${s.key}__range`] =
@@ -55,10 +55,10 @@ export function MetricChart({ def, weeks, series, labels }: Props) {
     return row;
   });
 
-  const visibleWeeks = new Set(weeks);
+  const visibleWeeks = new Set(periods);
   const values = series.flatMap((s) =>
     s.points
-      .filter((p) => visibleWeeks.has(p.week))
+      .filter((p) => visibleWeeks.has(p.period))
       .flatMap((p) => [p?.median, p?.min, p?.max].filter((v): v is number => v != null))
   );
   const dataMax = values.length > 0 ? Math.max(...values) : def.poor;
@@ -94,7 +94,7 @@ export function MetricChart({ def, weeks, series, labels }: Props) {
 
           <CartesianGrid stroke="#e5e7eb" strokeDasharray="3 3" vertical={false} />
           <XAxis
-            dataKey="week"
+            dataKey="period"
             tick={{ fontSize: 11 }}
             tickMargin={8}
             minTickGap={16}
@@ -120,7 +120,7 @@ export function MetricChart({ def, weeks, series, labels }: Props) {
                 <div className="tooltip">
                   <strong>{labels.full(String(label))}</strong>
                   {series.map((s) => {
-                    const row = rows.find((r) => r.week === label);
+                    const row = rows.find((r) => r.period === label);
                     const median = row?.[s.key] as number | null | undefined;
                     const range = row?.[`${s.key}__range`] as [number, number] | null;
                     if (median == null) return null;

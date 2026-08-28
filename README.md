@@ -57,7 +57,7 @@ back.
 It could not be relied on. The site is behind Cloudflare bot management, which intermittently
 serves an automated browser a challenge screen instead of the page - reliably so from GitHub's
 runners. The failure is not a gap in the data but a plausible one: the interstitial is a tiny
-self-contained document, so it measures as an excellent page. One CI run published a full week at
+self-contained document, so it measures as an excellent page. One CI run published an entire scan at
 roughly 400 ms LCP and 0.001 CLS identically across all three pages, with a 6 ms TTFB and zero
 cards on a search results page, before it was caught.
 
@@ -124,11 +124,11 @@ node scan/verify.mjs   # selector probe for the local harness, no Lighthouse, ~9
 Both scans take env overrides for quick iteration:
 
 ```bash
-SAMPLES=1 ONLY_TARGETS=srp ONLY_FORM_FACTORS=mobile WEEK=test pnpm run scan
+SAMPLES=1 ONLY_TARGETS=srp ONLY_FORM_FACTORS=mobile PERIOD=test pnpm run scan
 HEADFUL=1 ONLY_TARGETS=srp node scan/verify.mjs
 ```
 
-`WEEK` overrides the run's period id, which is otherwise the Jakarta calendar date. Use it for
+`PERIOD` overrides the run's period id, which is otherwise the Jakarta calendar date. Use it for
 throwaway runs so they do not land on a real one; delete the file afterwards, since the workflow
 commits `data/` wholesale.
 
@@ -152,7 +152,7 @@ commits `data/` wholesale.
    Point `tiket-accom-cwv.devinekadeni.com` at the project for automatic TLS.
 
 3. **Seed the trend.** Runs are keyed by date, so triggering the workflow twice in one day
-   overwrites rather than accumulating. Let the schedule build the history, or pass `WEEK` for a
+   overwrites rather than accumulating. Let the schedule build the history, or pass `PERIOD` for a
    one-off:
    ```bash
    gh workflow run cwv-scan.yml --repo devinekadeni/tiket-accom-cwv-dashboard
