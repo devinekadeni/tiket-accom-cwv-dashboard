@@ -75,7 +75,9 @@ export default function App() {
 
   const allWeeks = useMemo(() => history.weeks.map((w) => w.week), []);
   const weeks = useMemo(() => filterPeriods(allWeeks, range), [allWeeks, range]);
-  const labels = useMemo(() => buildPeriodLabels(weeks), [weeks]);
+  // Built over every period, not the filtered ones, so the masthead can still
+  // name the latest run when the current filter excludes it.
+  const labels = useMemo(() => buildPeriodLabels(allWeeks), [allWeeks]);
 
   const cruxPeriods = useMemo(
     () =>
@@ -96,7 +98,7 @@ export default function App() {
 
   const rangeSummary =
     tab === 'lab'
-      ? `${weeks.length} of ${allWeeks.length} weekly scans`
+      ? `${weeks.length} of ${allWeeks.length} scans`
       : `${filterPeriods(cruxPeriods, range).length} of ${cruxPeriods.length} windows`;
 
   function toggle(key: string) {
@@ -114,12 +116,12 @@ export default function App() {
         <div>
           <h1>tiket.com accommodation - Core Web Vitals</h1>
           <p className="muted">
-            Weekly Lighthouse scan of three production hotel pages, median of{' '}
+            Lighthouse scan of three production hotel pages after each deploy day, median of{' '}
             {latest?.samples ?? 5} samples.{' '}
             {latest && (
               <>
-                Latest run <strong>{latest.week}</strong> on{' '}
-                {new Date(latest.runAt).toLocaleDateString()} with Lighthouse{' '}
+                Latest run{' '}
+                <strong>{labels.full(latest.week)}</strong> with Lighthouse{' '}
                 {latest.lighthouseVersion}.
               </>
             )}
@@ -162,7 +164,7 @@ export default function App() {
       {tab === 'lab' ? (
         allWeeks.length === 0 ? (
           <p className="empty">
-            No runs yet. Trigger the <code>weekly-cwv</code> workflow to record the first week.
+            No runs yet. Trigger the <code>cwv-scan</code> workflow to record the first one.
           </p>
         ) : (
           <LabTab
@@ -262,7 +264,8 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
       <div className="callout">
         <h2>How this data is collected</h2>
         <p>
-          Once a week a GitHub Actions runner asks Google's PageSpeed Insights API to run
+          Twice a week - early on Tuesday and Friday mornings, after each of the team's two
+          deploy days - a GitHub Actions runner asks Google's PageSpeed Insights API to run
           Lighthouse against the three production URLs above, at its <strong>mobile</strong>{' '}
           preset (throttled phone on slow 4G) and its <strong>desktop</strong> one. Each page
           is measured <strong>{samples} times</strong> per form factor; the line is the median
@@ -298,9 +301,10 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
         <p className="empty">No scans in the selected range. Widen the date filter.</p>
       ) : (
         <>
-          <h2>Latest week</h2>
+          <h2>Latest run</h2>
           <p className="muted">
-            Value, change from the previous week, and rating against Google's thresholds.
+            Value, change from the previous run, and rating against Google's thresholds. Runs
+            sit either side of a deploy window, so a change here contains one deploy.
           </p>
           <SummaryGrid rows={rows} weeks={weeks} />
 

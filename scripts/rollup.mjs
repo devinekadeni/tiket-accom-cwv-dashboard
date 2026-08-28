@@ -45,7 +45,7 @@ await fs.mkdir(path.dirname(OUT_PATH), { recursive: true });
 await fs.writeFile(OUT_PATH, `${JSON.stringify(history)}\n`);
 
 console.log(
-  `[rollup] ${runs.length} week(s), ${history.series.length} series -> ` +
+  `[rollup] ${runs.length} run(s), ${history.series.length} series -> ` +
     `${path.relative(REPO_ROOT, OUT_PATH)}`
 );
 
@@ -63,7 +63,9 @@ async function readRuns() {
     const raw = await fs.readFile(path.join(RUNS_DIR, file), 'utf8');
     parsed.push(JSON.parse(raw));
   }
-  // ISO week ids sort lexicographically, so this is chronological.
+  // Period ids are YYYY-MM-DD, which sorts lexicographically into chronological
+  // order. They were ISO week ids until the scan started running twice a week,
+  // when a second run would have overwritten the first week's file.
   return parsed.sort((a, b) => a.week.localeCompare(b.week));
 }
 

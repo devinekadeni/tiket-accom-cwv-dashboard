@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Weekly lab scan via the PageSpeed Insights API.
+ * Lab scan via the PageSpeed Insights API, run after each deploy day.
  *
  * Replaces driving Lighthouse locally. The site is behind Cloudflare bot
  * management, which intermittently serves an automated browser an interstitial
@@ -21,8 +21,11 @@
  *   PSI_API_KEY=... node scan/psi.mjs
  *   SAMPLES=1 ONLY_TARGETS=srp node scan/psi.mjs
  *
- * Writes data/runs/<week>.json in the same shape the local harness wrote, so
- * the rollup and dashboard are unchanged.
+ * Writes data/runs/<date>.json in the same shape the local harness wrote, so
+ * the rollup and dashboard are unchanged. The `week` field in that file holds
+ * the run's period id, which is now a date rather than an ISO week - the name
+ * predates the schedule change and is kept only to avoid renaming it through
+ * the rollup, the types and every chart in one go.
  */
 
 import fs from 'node:fs/promises';
@@ -31,7 +34,7 @@ import { fileURLToPath } from 'node:url';
 
 import { TARGETS } from './targets.mjs';
 import { NAVIGATION_METRICS } from './lib/config.mjs';
-import { summarize, isoWeek } from './lib/stats.mjs';
+import { summarize, runDate } from './lib/stats.mjs';
 import { assertLhrNotChallenged } from './lib/challenge.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -42,7 +45,7 @@ const ENDPOINT = 'https://www.googleapis.com/pagespeedonline/v5/runPagespeed';
 const API_KEY = process.env.PSI_API_KEY || process.env.CRUX_API_KEY;
 
 const SAMPLES = Number(process.env.SAMPLES) || 5;
-const WEEK = process.env.WEEK || isoWeek();
+const WEEK = process.env.WEEK || runDate();
 
 /** PSI's own name for each form factor. */
 const STRATEGIES = { mobile: 'mobile', desktop: 'desktop' };
@@ -193,7 +196,7 @@ async function main() {
 
   const failures = [];
   console.log(
-    `[psi] week ${WEEK}, ${selectedTargets.length} targets x ` +
+    `[psi] run ${WEEK}, ${selectedTargets.length} targets x ` +
       `${selectedFormFactors.length} form factors x ${SAMPLES} samples`
   );
 
@@ -263,7 +266,7 @@ async function main() {
   const minutes = ((Date.now() - startedAt) / 60_000).toFixed(1);
   const runPath = path.join(REPO_ROOT, 'data', 'runs', `${WEEK}.json`);
 
-  // A partial week is a data point with a gap in it; a week where nothing
+  // A partial run is a data point with a gap in it; a run where nothing
   // succeeded is not a data point, and committing it would put an empty entry
   // into the trend.
   const total = selectedTargets.length * selectedFormFactors.length;

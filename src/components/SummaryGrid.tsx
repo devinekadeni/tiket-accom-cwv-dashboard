@@ -14,7 +14,7 @@ type Props = {
   weeks: string[];
 };
 
-/** Latest week per series: value, week-over-week delta, and pass/fail. */
+/** Latest run per series: value, delta against the previous run, and pass/fail. */
 export function SummaryGrid({ rows, weeks }: Props) {
   const interactions = [...new Set(rows.flatMap((row) => Object.keys(row.series.inp)))].sort();
 

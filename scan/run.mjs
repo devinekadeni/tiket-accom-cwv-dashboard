@@ -14,7 +14,7 @@
  *   SAMPLES=5            samples per target per form factor
  *   ONLY_TARGETS=srp,pdp restrict to these target ids
  *   ONLY_FORM_FACTORS=mobile
- *   WEEK=2026-W33        override the derived ISO week
+ *   WEEK=2026-09-01     override the derived run date
  *   HEADFUL=1            watch the browser
  *   NO_REPORTS=1         skip HTML report generation
  */
@@ -53,14 +53,14 @@ import {
 } from './lib/interactions.mjs';
 import { attachContextCapture } from './lib/context.mjs';
 import { assertNotChallenged } from './lib/challenge.mjs';
-import { summarize, isoWeek } from './lib/stats.mjs';
+import { summarize, runDate } from './lib/stats.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const SAMPLES = Number(process.env.SAMPLES) || DEFAULT_SAMPLES;
 /** Held open after an interaction settles so its event timing can finalise. */
 const INTERACTION_DWELL_MS = 1_000;
-const WEEK = process.env.WEEK || isoWeek();
+const WEEK = process.env.WEEK || runDate();
 const WRITE_REPORTS = process.env.NO_REPORTS !== '1';
 
 const selectedTargets = filterBy(TARGETS, process.env.ONLY_TARGETS, (t) => t.id);
@@ -73,7 +73,7 @@ const selectedFormFactors = filterBy(
 async function main() {
   const startedAt = Date.now();
   console.log(
-    `[scan] week ${WEEK}, ${selectedTargets.length} targets x ` +
+    `[scan] run ${WEEK}, ${selectedTargets.length} targets x ` +
       `${selectedFormFactors.length} form factors x ${SAMPLES} samples`
   );
 

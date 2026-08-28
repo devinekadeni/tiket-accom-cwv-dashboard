@@ -1,17 +1,32 @@
-name: weekly-cwv
+name: cwv-scan
 
 on:
   schedule:
-    # Monday 02:00 UTC. The weekly data commit also counts as repo activity,
-    # which is what stops GitHub disabling this schedule after 60 days idle.
-    - cron: '0 2 * * 1'
+    # Mon and Thu 21:00 UTC, which is Tue and Fri 04:17 WIB - the small hours
+    # after each of the team's two deploy days.
+    #
+    # One run per deploy window is enough to attribute a change: each run is the
+    # reading after the deploy that just happened and the baseline before the
+    # next, so a regression between two runs contains exactly one deploy.
+    #
+    # Deploys can finish at any hour, so this leaves the rest of the night as
+    # margin, and lets caches warm - measuring straight after a deploy reads
+    # cold caches as a regression. It is also the quietest time for an
+    # Indonesian audience, which keeps server-side timings comparable run to
+    # run; peak-hour reality is the field tab's job, not the lab's.
+    #
+    # :17 because scheduled runs queue heavily on the hour and start late.
+    #
+    # The data commit each run also counts as repo activity, which is what stops
+    # GitHub disabling this schedule after 60 days idle.
+    - cron: '17 21 * * 1,4'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 concurrency:
-  group: weekly-cwv
+  group: cwv-scan
   cancel-in-progress: false
 
 jobs:
@@ -61,7 +76,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "no data changes to commit"
           else
-            git commit -m "data: ${{ steps.scan.outputs.week || 'weekly' }} scan"
+            git commit -m "data: ${{ steps.scan.outputs.week || 'unknown' }} scan"
             git push
           fi
 
