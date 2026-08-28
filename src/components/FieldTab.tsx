@@ -191,12 +191,12 @@ export function FieldTab({ crux, range }: { crux: Crux; range: DateRange }) {
           )}
         </p>
         <p>
-          Locale is part of the path, so <code>/en-id/</code> and <code>/id-id/</code> are
+          Locale is part of the path, so <code>/id-id/</code> and <code>/en-id/</code> are
           separate pages to CrUX and are listed separately here. Treating them as one page
           would be misleading: Indonesian carries the bulk of real traffic and has run several
           seconds slower on phones for the same metric and window, while matching English on
-          desktop. Only the English pages are scanned in the lab tab, so the Indonesian rows
-          have no lab counterpart to compare against.
+          desktop. The lab tab scans the Indonesian pages, so those rows line up with it; the
+          English rows are here as the reference that made the gap visible.
         </p>
         <p className="muted">
           Fetched {new Date(crux.fetchedAt).toLocaleDateString()}.

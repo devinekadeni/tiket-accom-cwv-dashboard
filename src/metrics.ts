@@ -114,14 +114,13 @@ const TARGET_HUES: Record<string, [string, string]> = {
   landing: ['#1d4ed8', '#93c5fd'],
   srp: ['#b91c1c', '#fca5a5'],
   pdp: ['#047857', '#6ee7b7'],
-  // Field-only series, which have no lab counterpart. The Indonesian pages get
-  // their own hues rather than a shade of their English twin: the two locales
-  // are compared directly and often diverge by several seconds, so they need to
-  // be told apart at a glance rather than read as a variant of one line.
+  // Field-only series, which have no lab counterpart. The English pages get
+  // their own hues rather than a shade of their Indonesian twin: the two
+  // locales are compared directly and often diverge by several seconds, so they
+  // need to be told apart at a glance rather than read as a variant of one line.
   origin: ['#6d28d9', '#c4b5fd'],
-  'landing-id': ['#c2410c', '#fdba74'],
-  'srp-id': ['#a21caf', '#f0abfc'],
-  'pdp-id': ['#a16207', '#fde047'],
+  'landing-en': ['#c2410c', '#fdba74'],
+  'srp-en': ['#a21caf', '#f0abfc'],
 };
 
 const FALLBACK_HUES: [string, string] = ['#6d28d9', '#c4b5fd'];

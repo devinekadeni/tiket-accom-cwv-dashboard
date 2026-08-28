@@ -25,7 +25,7 @@ const ORIGIN = 'https://www.tiket.com';
 const BASE = {
   landing: {
     label: 'Hotel landing',
-    url: 'https://www.tiket.com/en-id/hotel',
+    url: 'https://www.tiket.com/id-id/hotel',
     mobile: {
       metrics: { lcp: 6280, cls: 0.02, fcp: 2232, ttfb: 501, tbt: 3245, speedIndex: 6108, perfScore: 40 },
       inp: { 'open-destination-autocomplete': 315 },
@@ -39,7 +39,7 @@ const BASE = {
   },
   srp: {
     label: 'Hotel SRP (Jakarta)',
-    url: 'https://www.tiket.com/en-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta',
+    url: 'https://www.tiket.com/id-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta',
     mobile: {
       metrics: { lcp: 21400, cls: 0.27, fcp: 1954, ttfb: 431, tbt: 1014, speedIndex: 11469, perfScore: 28 },
       inp: { 'open-filter-sheet': 256, 'open-sort-sheet': 152 },
@@ -52,8 +52,8 @@ const BASE = {
     },
   },
   pdp: {
-    label: 'Hotel PDP (Apurva Kempinski)',
-    url: 'https://www.tiket.com/en-id/hotel/indonesia/the-apurva-kempinski-bali-202001550596500105',
+    label: 'Hotel PDP (Kempinski Jakarta)',
+    url: 'https://www.tiket.com/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-108001534490372415',
     mobile: {
       metrics: { lcp: 18371, cls: 0.122, fcp: 3228, ttfb: 1194, tbt: 1089, speedIndex: 9489, perfScore: 34 },
       inp: { 'see-room': 532 },
@@ -209,10 +209,13 @@ function cruxRecord(formFactor, scale, key, firstPopulated) {
 }
 
 // Mirrors what the real API returns, including the parts that look like bugs
-// and are not: the English PDP missing entirely, the SRPs reported without
-// their query string and populated in only a handful of windows, the Indonesian
-// PDP on phones only, and the Indonesian landing page several times worse than
-// its English twin on phones while matching it on desktop.
+// and are not: the SRPs reported without their query string and populated in
+// only a handful of windows, the Indonesian PDP on phones only, and the
+// Indonesian landing page several times worse than its English twin on phones
+// while matching it on desktop.
+//
+// The first three ids match the lab targets, so those rows line up with the lab
+// tab; the -en scopes are field-only.
 //
 // `phone` and `desktop` are multipliers on CRUX_METRICS; null means the form
 // factor is not published. `from` is the first populated window out of 40.
@@ -228,34 +231,6 @@ const CRUX_SCOPES = [
   },
   {
     id: 'landing',
-    label: 'Hotel landing - English',
-    kind: 'url',
-    url: `${ORIGIN}/en-id/hotel`,
-    phone: 0.92,
-    desktop: 0.55,
-    from: 5,
-  },
-  {
-    id: 'srp',
-    label: 'Hotel SRP (Jakarta) - English',
-    kind: 'url',
-    url: `${ORIGIN}/en-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta`,
-    matchedUrl: `${ORIGIN}/en-id/hotel/search`,
-    phone: 1.24,
-    desktop: 0.74,
-    from: 38,
-  },
-  {
-    id: 'pdp',
-    label: 'Hotel PDP (Apurva Kempinski) - English',
-    kind: 'url',
-    url: `${ORIGIN}/en-id/hotel/indonesia/the-apurva-kempinski-bali-202001550596500105`,
-    phone: null,
-    desktop: null,
-    from: 0,
-  },
-  {
-    id: 'landing-id',
     label: 'Hotel landing - Indonesian',
     kind: 'url',
     url: `${ORIGIN}/id-id/hotel`,
@@ -264,22 +239,41 @@ const CRUX_SCOPES = [
     from: 5,
   },
   {
-    id: 'srp-id',
-    label: 'Hotel SRP - Indonesian',
+    id: 'srp',
+    label: 'Hotel SRP (Jakarta) - Indonesian',
     kind: 'url',
-    url: `${ORIGIN}/id-id/hotel/search`,
+    url: `${ORIGIN}/id-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta`,
+    matchedUrl: `${ORIGIN}/id-id/hotel/search`,
     phone: 3.4,
     desktop: 0.75,
     from: 34,
   },
   {
-    id: 'pdp-id',
+    id: 'pdp',
     label: 'Hotel PDP (Kempinski Jakarta) - Indonesian',
     kind: 'url',
     url: `${ORIGIN}/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-108001534490372415`,
     phone: 1.9,
     desktop: null,
     from: 28,
+  },
+  {
+    id: 'landing-en',
+    label: 'Hotel landing - English',
+    kind: 'url',
+    url: `${ORIGIN}/en-id/hotel`,
+    phone: 0.92,
+    desktop: 0.55,
+    from: 5,
+  },
+  {
+    id: 'srp-en',
+    label: 'Hotel SRP - English',
+    kind: 'url',
+    url: `${ORIGIN}/en-id/hotel/search`,
+    phone: 1.24,
+    desktop: 0.74,
+    from: 38,
   },
 ];
 

@@ -53,15 +53,15 @@ if (!apiKey) {
  * the same page breakdown as the lab tab wherever the data supports it, then
  * the pages that exist only in the field.
  *
- * The scanned pages are all English, and their labels say so here because the
- * Indonesian twins sit beside them in the same chart. Labels have to be unique
+ * The scanned pages are all Indonesian, and their labels say so here because
+ * the English twins sit beside them in the same chart. Labels have to be unique
  * for the legend and tooltips to be readable at all.
  */
 const SCOPES = [
   { id: 'origin', label: 'All of tiket.com', kind: 'origin', url: ORIGIN },
   ...TARGETS.map((target) => ({
     id: target.id,
-    label: `${target.label} - English`,
+    label: `${target.label} - Indonesian`,
     kind: 'url',
     url: target.url,
   })),

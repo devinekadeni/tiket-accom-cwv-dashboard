@@ -282,10 +282,9 @@ function LabTab({ weeks, labels, rows, groups, hidden, onToggle, samples }: LabP
           catches regressions early and tells you which page and which interaction moved, but
           it is not what your users experienced - the field tab is. Run context under each
           chart records what the page actually returned that week, since a promo module
-          appearing can move CLS more than any code change. Note that all three URLs are the
-          English (<code>/en-id/</code>) pages; the Indonesian pages carry more traffic and
-          field data shows them behaving differently, so read the field tab before treating
-          these numbers as the whole picture.
+          appearing can move CLS more than any code change. All three URLs are the Indonesian
+          (<code>/id-id/</code>) pages, which carry the bulk of real traffic; the English
+          equivalents behave differently and appear in the field tab for comparison.
         </p>
       </div>
 

@@ -5,8 +5,13 @@
  * which asserts exactly one *visible* match. A silent 0 ms interaction is worse
  * than a failed run, so absence and ambiguity both throw.
  *
- * Selectors below were probed against production on 13 Aug 2026 with
+ * Selectors below were probed against production on 28 Aug 2026 with
  * `node scan/verify.mjs`. Re-run that after any release touching these pages.
+ *
+ * Targets are the Indonesian (/id-id/) pages: they carry the bulk of the
+ * traffic, and CrUX shows them behaving very differently from the English ones
+ * on phones. Two selectors match on visible text, so a locale change means
+ * re-reading those strings - `node scan/probe-locale.mjs` prints them.
  */
 
 export const ORIGIN = 'https://www.tiket.com';
@@ -23,7 +28,7 @@ export const TARGETS = [
   {
     id: 'landing',
     label: 'Hotel landing',
-    url: 'https://www.tiket.com/en-id/hotel',
+    url: 'https://www.tiket.com/id-id/hotel',
     // Timespan steps are mobile-only: desktop filters are an inline sidebar
     // rather than a sheet, and desktop interactions measure fast unthrottled.
     interactions: {
@@ -42,7 +47,7 @@ export const TARGETS = [
     label: 'Hotel SRP (Jakarta)',
     // No date params, so the URL cannot go stale. The app appends a
     // searchSessionId client-side via replaceState, which is not a navigation.
-    url: 'https://www.tiket.com/en-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta',
+    url: 'https://www.tiket.com/id-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta',
     interactions: {
       mobile: [
         {
@@ -60,6 +65,11 @@ export const TARGETS = [
           // - Position is not usable: the probe found two marketing chips
           //   ("Up to 50% off", "Concert Deals") sitting at indexes 2 and 3,
           //   and those come and go.
+          //
+          // "Filter" is the label in Indonesian too, so this one survived the
+          // move to /id-id/ unchanged - but it is still a text match, and the
+          // sibling chip "Filter Populer" starts with the same word, which is
+          // why the comparison has to stay exact rather than substring.
           name: 'open-filter-sheet',
           trigger: {
             selector:
@@ -78,12 +88,22 @@ export const TARGETS = [
         },
       ],
     },
-    context: { cards: true, searchApi: /tix-hotel-search\/v\d+\/search/i },
+    // The negative lookahead excludes /search/filters, a sibling endpoint that
+    // returns in tens of milliseconds. Normally the slowest match wins and the
+    // real search dominates, but on a run where the search is slow enough to
+    // miss the capture window, /filters was the only match left and recorded
+    // 45ms - a wrong number where a missing one belongs.
+    context: { cards: true, searchApi: /tix-hotel-search\/v\d+\/search(?!\/)/i },
   },
   {
     id: 'pdp',
-    label: 'Hotel PDP (Apurva Kempinski)',
-    url: 'https://www.tiket.com/en-id/hotel/indonesia/the-apurva-kempinski-bali-202001550596500105',
+    label: 'Hotel PDP (Kempinski Jakarta)',
+    // Chosen because CrUX publishes it: it is the only tiket detail page found
+    // above the reporting threshold, so it is the one PDP where the lab number
+    // and the field number describe the same URL and can be read against each
+    // other. Every English PDP probed, including the Apurva Kempinski page this
+    // replaces, returns no field data at all.
+    url: 'https://www.tiket.com/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-108001534490372415',
     interactions: {
       mobile: [
         {
@@ -106,35 +126,29 @@ export const TARGETS = [
 /**
  * Pages tracked in the field but never scanned in the lab.
  *
- * Locale sits in the URL path, so CrUX counts `/en-id/hotel` and `/id-id/hotel`
- * as separate pages - and they are nowhere near equivalent. On phones the
- * Indonesian landing page reported an LCP p75 around 9.9s against 2.8s for the
- * English one, on the same 28-day window, while desktop was near identical on
- * both. Indonesian is where the traffic is, so leaving it out made the field
- * tab look far healthier than the site actually is.
+ * The English mirror of the scanned pages. Locale sits in the URL path, so CrUX
+ * counts `/id-id/hotel` and `/en-id/hotel` as separate pages, and they are
+ * nowhere near equivalent: on phones the Indonesian landing page reported an
+ * LCP p75 around 9.9s against 2.8s for the English one over the same 28-day
+ * window, while desktop was near identical on both. The lab scans Indonesian
+ * because that is where the traffic is; English stays here as the reference
+ * that made the gap visible in the first place.
  *
- * The PDP is a different hotel as well as a different locale. Every en-id hotel
- * page probed was below the CrUX reporting threshold, including the one the lab
- * scans; this is the only tiket PDP found that Google publishes, so it is the
- * only way to see a detail page in field data at all.
+ * There is no English PDP scope: every en-id hotel page probed was below the
+ * CrUX reporting threshold, so it would only ever render as "not published".
  */
 export const FIELD_ONLY_SCOPES = [
   {
-    id: 'landing-id',
-    label: 'Hotel landing - Indonesian',
-    url: `${ORIGIN}/id-id/hotel`,
+    id: 'landing-en',
+    label: 'Hotel landing - English',
+    url: `${ORIGIN}/en-id/hotel`,
   },
   {
-    id: 'srp-id',
-    label: 'Hotel SRP - Indonesian',
+    id: 'srp-en',
+    label: 'Hotel SRP - English',
     // CrUX aggregates after dropping the query string, so the bare path is what
     // it reports against; sending the full search URL would resolve here anyway.
-    url: `${ORIGIN}/id-id/hotel/search`,
-  },
-  {
-    id: 'pdp-id',
-    label: 'Hotel PDP (Kempinski Jakarta) - Indonesian',
-    url: `${ORIGIN}/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-108001534490372415`,
+    url: `${ORIGIN}/en-id/hotel/search`,
   },
 ];
 
@@ -156,9 +170,11 @@ export const OVERLAYS = [
     container: '[class*="BaseModal-module__modal_wrapper"]',
     // No testid and no aria-label on these buttons, so this needs the same
     // scoped-prefix plus exact-text approach as the filter chip.
+    // Indonesian, because the scan targets /id-id/. The English page renders
+    // "Continue without promo" in the same slot.
     dismiss: {
       selector: '[class*="BaseModal-module__modal_wrapper"] button',
-      text: 'Continue without promo',
+      text: 'Lanjut tanpa promo',
     },
     // Injected a beat after load, so this waits rather than sampling once.
     timeoutMs: 10_000,
