@@ -1,0 +1,344 @@
+{
+  "week": "2026-W35",
+  "runAt": "2026-08-28T08:09:49.750Z",
+  "samples": 5,
+  "lighthouseVersion": "12.8.2",
+  "runner": {
+    "platform": "linux",
+    "arch": "x64",
+    "node": "v20.20.2",
+    "ci": "github-actions",
+    "commit": "e4fddb559de05f65eff9df75917f53bcf7a1838b"
+  },
+  "targets": {
+    "landing": {
+      "label": "Hotel landing",
+      "url": "https://www.tiket.com/id-id/hotel",
+      "formFactors": {
+        "mobile": {
+          "metrics": {},
+          "inp": {},
+          "context": null,
+          "sampleCount": 0,
+          "errors": [
+            {
+              "sample": 1,
+              "message": "landing/mobile open-destination-autocomplete: no visible match for [data-testid=\"destination-input\"] within 30000ms"
+            },
+            {
+              "sample": 2,
+              "message": "landing/mobile open-destination-autocomplete: no visible match for [data-testid=\"destination-input\"] within 30000ms"
+            },
+            {
+              "sample": 3,
+              "message": "landing/mobile open-destination-autocomplete: no visible match for [data-testid=\"destination-input\"] within 30000ms"
+            },
+            {
+              "sample": 4,
+              "message": "landing/mobile open-destination-autocomplete: no visible match for [data-testid=\"destination-input\"] within 30000ms"
+            },
+            {
+              "sample": 5,
+              "message": "landing/mobile open-destination-autocomplete: no visible match for [data-testid=\"destination-input\"] within 30000ms"
+            }
+          ]
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 425,
+              "min": 404,
+              "max": 490,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.0014,
+              "min": 0.0014,
+              "max": 0.0014,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 278,
+              "min": 271,
+              "max": 286,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 9,
+              "min": 6,
+              "max": 10,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 23,
+              "min": 17,
+              "max": 45,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 370,
+              "min": 363,
+              "max": 407,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 100,
+              "min": 100,
+              "max": 100,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": {
+            "cards": null,
+            "searchApiMs": null,
+            "searchApiUrl": null,
+            "overlays": null,
+            "hasPromo": null,
+            "pageModules": null,
+            "slowestXhr": [
+              {
+                "url": "challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/760100531:1787901017:yAEEG-c2oTRc1kK848shkS4jUYssmoDd0W2b_4mQzVU/a321ddb04b1b6c48/Vyuf_g9BS8NCCWjcOeCFUP4i38lHC.sN8NAOtjjhn48-1787904903-1.2.1.1-8CROu6YgUNdzguojPF4FkI97edoH3QshkWSrm8LbG8inHHuY86KXq_KMQCkFZuSc",
+                "durationMs": 238,
+                "status": 200
+              },
+              {
+                "url": "challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/760100531:1787901017:yAEEG-c2oTRc1kK848shkS4jUYssmoDd0W2b_4mQzVU/a321ddb04b1b6c48/Vyuf_g9BS8NCCWjcOeCFUP4i38lHC.sN8NAOtjjhn48-1787904903-1.2.1.1-8CROu6YgUNdzguojPF4FkI97edoH3QshkWSrm8LbG8inHHuY86KXq_KMQCkFZuSc",
+                "durationMs": 34,
+                "status": 200
+              },
+              {
+                "url": "www.tiket.com/cdn-cgi/challenge-platform/h/b/fo/4050799373:1787901016:o7IY4GE2SX5-zOXkCx3WxneUIZBgv7heAtqErl5Wh34/a321ddae1bf0eb20/7xg9heULuFbqvmN8OJ7cmPcgDlKP9fje2r6YalctxM8-1787904903-1.2.1.1-bI9c8Oo.D354O15ocmJ7x9uupMX21OnT_LKc56A0oGoOlKbRQzbnVDJ5GOrRAoiA",
+                "durationMs": 19,
+                "status": 200
+              }
+            ]
+          },
+          "sampleCount": 5,
+          "errors": []
+        }
+      }
+    },
+    "srp": {
+      "label": "Hotel SRP (Jakarta)",
+      "url": "https://www.tiket.com/id-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta",
+      "formFactors": {
+        "mobile": {
+          "metrics": {},
+          "inp": {},
+          "context": null,
+          "sampleCount": 0,
+          "errors": [
+            {
+              "sample": 1,
+              "message": "srp/mobile open-filter-sheet: no visible match for [class*=\"SrpFilterChipsMobile_wrapper__\"] > button[class*=\"Chip_chip__\"] with exact text \"Filter\" within 30000ms"
+            },
+            {
+              "sample": 2,
+              "message": "srp/mobile open-filter-sheet: no visible match for [class*=\"SrpFilterChipsMobile_wrapper__\"] > button[class*=\"Chip_chip__\"] with exact text \"Filter\" within 30000ms"
+            },
+            {
+              "sample": 3,
+              "message": "srp/mobile open-filter-sheet: no visible match for [class*=\"SrpFilterChipsMobile_wrapper__\"] > button[class*=\"Chip_chip__\"] with exact text \"Filter\" within 30000ms"
+            },
+            {
+              "sample": 4,
+              "message": "srp/mobile open-filter-sheet: no visible match for [class*=\"SrpFilterChipsMobile_wrapper__\"] > button[class*=\"Chip_chip__\"] with exact text \"Filter\" within 30000ms"
+            },
+            {
+              "sample": 5,
+              "message": "srp/mobile open-filter-sheet: no visible match for [class*=\"SrpFilterChipsMobile_wrapper__\"] > button[class*=\"Chip_chip__\"] with exact text \"Filter\" within 30000ms"
+            }
+          ]
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 414,
+              "min": 280,
+              "max": 460,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.0014,
+              "min": 0.0014,
+              "max": 0.002,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 281,
+              "min": 275,
+              "max": 284,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 10,
+              "min": 6,
+              "max": 12,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 25,
+              "min": 18,
+              "max": 30,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 385,
+              "min": 373,
+              "max": 433,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 100,
+              "min": 100,
+              "max": 100,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": {
+            "cards": {
+              "median": 0,
+              "min": 0,
+              "max": 0,
+              "samples": 5
+            },
+            "searchApiMs": null,
+            "searchApiUrl": null,
+            "overlays": null,
+            "hasPromo": null,
+            "pageModules": null,
+            "slowestXhr": [
+              {
+                "url": "challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/760100531:1787901017:yAEEG-c2oTRc1kK848shkS4jUYssmoDd0W2b_4mQzVU/a321e53118f5055e/fLW9x449AQ5HKrqIFGfO.bzl0BfWf.BjPnPGqxIF018-1787905211-1.2.1.1-y3xkg5_QELrfSTi2uBjsXXE2yk.50NE_jFHRWFf20AhAjvEGp2M5Z5n6FoxJqokw",
+                "durationMs": 210,
+                "status": 200
+              },
+              {
+                "url": "www.tiket.com/cdn-cgi/challenge-platform/h/b/fo/4050799373:1787901016:o7IY4GE2SX5-zOXkCx3WxneUIZBgv7heAtqErl5Wh34/a321e52eae9d2516/UHvMFWVZbzSkYeE8ENR2_G6aLXCx9Eo5rixT_DiLNrc-1787905210-1.2.1.1-7VlSlVJ1e9Hki.qa6iPyhPVEELFhz5xS93A4qRRrP20DM2VLfr2N23L2OY0AfhR_",
+                "durationMs": 55,
+                "status": 200
+              },
+              {
+                "url": "challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/760100531:1787901017:yAEEG-c2oTRc1kK848shkS4jUYssmoDd0W2b_4mQzVU/a321e53118f5055e/fLW9x449AQ5HKrqIFGfO.bzl0BfWf.BjPnPGqxIF018-1787905211-1.2.1.1-y3xkg5_QELrfSTi2uBjsXXE2yk.50NE_jFHRWFf20AhAjvEGp2M5Z5n6FoxJqokw",
+                "durationMs": 31,
+                "status": 200
+              }
+            ]
+          },
+          "sampleCount": 5,
+          "errors": []
+        }
+      }
+    },
+    "pdp": {
+      "label": "Hotel PDP (Kempinski Jakarta)",
+      "url": "https://www.tiket.com/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-108001534490372415",
+      "formFactors": {
+        "mobile": {
+          "metrics": {},
+          "inp": {},
+          "context": null,
+          "sampleCount": 0,
+          "errors": [
+            {
+              "sample": 1,
+              "message": "pdp/mobile see-room: no visible match for [data-testid=\"button-see-room\"] within 30000ms"
+            },
+            {
+              "sample": 2,
+              "message": "pdp/mobile see-room: no visible match for [data-testid=\"button-see-room\"] within 30000ms"
+            },
+            {
+              "sample": 3,
+              "message": "pdp/mobile see-room: no visible match for [data-testid=\"button-see-room\"] within 30000ms"
+            },
+            {
+              "sample": 4,
+              "message": "pdp/mobile see-room: no visible match for [data-testid=\"button-see-room\"] within 30000ms"
+            },
+            {
+              "sample": 5,
+              "message": "pdp/mobile see-room: no visible match for [data-testid=\"button-see-room\"] within 30000ms"
+            }
+          ]
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 404,
+              "min": 402,
+              "max": 418,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.0014,
+              "min": 0.0014,
+              "max": 0.0014,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 273,
+              "min": 269,
+              "max": 281,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 6,
+              "min": 6,
+              "max": 7,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 23,
+              "min": 19,
+              "max": 26,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 368,
+              "min": 351,
+              "max": 382,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 100,
+              "min": 100,
+              "max": 100,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": {
+            "cards": null,
+            "searchApiMs": null,
+            "searchApiUrl": null,
+            "overlays": null,
+            "hasPromo": null,
+            "pageModules": null,
+            "slowestXhr": [
+              {
+                "url": "challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/760100531:1787901017:yAEEG-c2oTRc1kK848shkS4jUYssmoDd0W2b_4mQzVU/a321ecabaac0ced7/ETGobr5YhOnriK4KOKCE2b7lnqGbLulCOfqTJHuYMnk-1787905517-1.2.1.1-lk_7hLRYxLLf3gPWHdpgHmlptB.2z35ubvDTTT6ghnv63wHI4jYhJ2lcjV44grUy",
+                "durationMs": 185,
+                "status": 200
+              },
+              {
+                "url": "challenges.cloudflare.com/cdn-cgi/challenge-platform/h/b/fo/760100531:1787901017:yAEEG-c2oTRc1kK848shkS4jUYssmoDd0W2b_4mQzVU/a321ecabaac0ced7/ETGobr5YhOnriK4KOKCE2b7lnqGbLulCOfqTJHuYMnk-1787905517-1.2.1.1-lk_7hLRYxLLf3gPWHdpgHmlptB.2z35ubvDTTT6ghnv63wHI4jYhJ2lcjV44grUy",
+                "durationMs": 29,
+                "status": 200
+              },
+              {
+                "url": "www.tiket.com/cdn-cgi/challenge-platform/h/b/fo/4050799373:1787901016:o7IY4GE2SX5-zOXkCx3WxneUIZBgv7heAtqErl5Wh34/a321eca98f8d89cc/ymuKEtRBU1dVWoIb7WReoVz9.US0u97545WtOOT_tgA-1787905517-1.2.1.1-v_Pxtd5BVrzjwdk_NCV4lJSkUVVI5W8nTEolxf7UC6oE7O1t7H3rc18qEnU.lhbn",
+                "durationMs": 15,
+                "status": 200
+              }
+            ]
+          },
+          "sampleCount": 5,
+          "errors": []
+        }
+      }
+    }
+  }
+}
