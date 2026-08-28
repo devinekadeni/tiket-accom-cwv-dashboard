@@ -52,3 +52,43 @@ export async function assertNotChallenged(page, label) {
     );
   }
 }
+
+/** Requests only the interstitial makes; Cloudflare's other /cdn-cgi/ assets
+ * appear on perfectly normal pages, so this must stay narrow. */
+const CHALLENGE_REQUEST = /\/cdn-cgi\/challenge-platform\//i;
+
+/**
+ * A real tiket.com page is megabytes. Anything this small did not render the
+ * site, whether that is an interstitial, an error page or a redirect stub.
+ */
+const IMPLAUSIBLE_BYTES = 100_000;
+
+/**
+ * The same guarantee for a result measured elsewhere.
+ *
+ * PageSpeed Insights runs Lighthouse on Google's own machines, so there is no
+ * live page left to inspect - only the report. The interstitial is still
+ * recognisable in it, by the challenge assets it loads and by being orders of
+ * magnitude too small to be the site.
+ *
+ * @param {object} lhr a Lighthouse result
+ * @param {string} label used in the error, e.g. "srp/desktop"
+ */
+export function assertLhrNotChallenged(lhr, label) {
+  const requests = lhr?.audits?.['network-requests']?.details?.items ?? [];
+  const marker = requests.find((item) => CHALLENGE_REQUEST.test(item.url ?? ''));
+  if (marker) {
+    throw new Error(
+      `${label}: served a bot challenge instead of the page (${marker.url}) - ` +
+        `no measurement taken`
+    );
+  }
+
+  const bytes = lhr?.audits?.['total-byte-weight']?.numericValue;
+  if (typeof bytes === 'number' && bytes < IMPLAUSIBLE_BYTES) {
+    throw new Error(
+      `${label}: page weighed ${Math.round(bytes / 1024)}KB, far too small to be ` +
+        `the real page - no measurement taken`
+    );
+  }
+}
