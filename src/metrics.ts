@@ -110,17 +110,14 @@ export function seriesKey(series: Pick<Series, 'targetId' | 'formFactor'>): stri
  * One hue per target so the three pages stay distinguishable, with desktop as
  * the lighter shade of the same hue.
  */
+/**
+ * One hue per page, the darker shade for mobile. The same page keeps its colour
+ * across both tabs, so a line means the same thing in the lab and in the field.
+ */
 const TARGET_HUES: Record<string, [string, string]> = {
   landing: ['#1d4ed8', '#93c5fd'],
   srp: ['#b91c1c', '#fca5a5'],
   pdp: ['#047857', '#6ee7b7'],
-  // Field-only series, which have no lab counterpart. The English pages get
-  // their own hues rather than a shade of their Indonesian twin: the two
-  // locales are compared directly and often diverge by several seconds, so they
-  // need to be told apart at a glance rather than read as a variant of one line.
-  origin: ['#6d28d9', '#c4b5fd'],
-  'landing-en': ['#c2410c', '#fdba74'],
-  'srp-en': ['#a21caf', '#f0abfc'],
 };
 
 const FALLBACK_HUES: [string, string] = ['#6d28d9', '#c4b5fd'];

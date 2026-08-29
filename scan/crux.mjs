@@ -1,19 +1,20 @@
 #!/usr/bin/env node
 /**
- * Chrome UX Report history for the tiket.com origin and, where it exists, for
- * each scanned page.
+ * Chrome UX Report history for each scanned page.
  *
  * This is the field counterpart to the lab scan: real users, 28-day rolling
  * window, p75. It settles what the lab numbers only approximate - and it lags,
  * so a fix ships about four weeks before this panel shows it.
  *
- * URL-level records are best effort. CrUX only publishes a URL once it clears
- * an undisclosed traffic threshold, so a search results page whose visits are
- * split across every destination and date combination will usually return
- * NOT_FOUND. That is an expected outcome here, not a failure: the origin record
- * always exists and the page records fill in wherever Google has the data.
+ * Every record is best effort. CrUX only publishes a URL once it clears an
+ * undisclosed traffic threshold, so a search results page whose visits are
+ * split across every destination and date combination will often return
+ * NOT_FOUND, and some pages report on phones but not on desktop. That is an
+ * expected outcome rather than a failure; the dashboard shows how many of the
+ * 40 windows each page actually reported so a short line is not misread as a
+ * sudden improvement.
  *
- * Fourteen calls per week against a 150 queries/minute quota, and the whole
+ * Six calls per run against a 150 queries/minute quota, and the whole
  * history comes back each time, so data/crux.json is overwritten rather than
  * appended.
  *
@@ -25,7 +26,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ORIGIN, TARGETS, FIELD_ONLY_SCOPES } from './targets.mjs';
+import { ORIGIN, TARGETS } from './targets.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ENDPOINT =
@@ -49,31 +50,29 @@ if (!apiKey) {
 }
 
 /**
- * The origin first, then one scope per scanned page so the field tab can offer
- * the same page breakdown as the lab tab wherever the data supports it, then
- * the pages that exist only in the field.
+ * Exactly the pages the lab scans, so every row in the field tab has a
+ * counterpart in the lab tab and the two can be read against each other.
  *
- * The scanned pages are all Indonesian, and their labels say so here because
- * the English twins sit beside them in the same chart. Labels have to be unique
- * for the legend and tooltips to be readable at all.
+ * This deliberately excludes two things it used to carry. An origin-wide scope
+ * ('All of tiket.com') was the only record guaranteed to exist, but it averages
+ * flights and trains in with accommodation and answers a question this
+ * dashboard is not about. The English (/en-id/) twins of these pages were here
+ * as the reference that first exposed how much slower Indonesian is on phones;
+ * that gap is documented in the README instead of occupying half the legend.
  */
-const SCOPES = [
-  { id: 'origin', label: 'All of tiket.com', kind: 'origin', url: ORIGIN },
-  ...TARGETS.map((target) => ({
-    id: target.id,
-    label: `${target.label} - Indonesian`,
-    kind: 'url',
-    url: target.url,
-  })),
-  ...FIELD_ONLY_SCOPES.map((scope) => ({ ...scope, kind: 'url' })),
-];
+const SCOPES = TARGETS.map((target) => ({
+  id: target.id,
+  label: target.label,
+  kind: 'url',
+  url: target.url,
+}));
 
 const records = {};
 for (const scope of SCOPES) {
   records[scope.id] = {};
 
   for (const formFactor of FORM_FACTORS) {
-    const query = scope.kind === 'origin' ? { origin: scope.url } : { url: scope.url };
+    const query = { url: scope.url };
     const response = await fetch(`${ENDPOINT}?key=${apiKey}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -86,9 +85,9 @@ for (const scope of SCOPES) {
 
     const body = await response.json();
 
-    // A URL below CrUX's reporting threshold is a normal outcome; the same
-    // answer for the origin means something is actually wrong.
-    if (response.status === 404 && scope.kind === 'url') {
+    // A URL below CrUX's reporting threshold is a normal outcome: the page is
+    // real, it just has too few reporting visitors for Google to publish it.
+    if (response.status === 404) {
       records[scope.id][formFactor] = null;
       console.log(`[crux] ${scope.id} ${formFactor}: no field data (below CrUX threshold)`);
       continue;

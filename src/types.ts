@@ -70,7 +70,7 @@ export type CruxSeries = {
 export type CruxScope = {
   id: string;
   label: string;
-  kind: 'origin' | 'url';
+  kind: 'url';
   requestedUrl: string;
   /** What CrUX matched, which drops query strings. Null when there is no data. */
   effectiveUrl: string | null;

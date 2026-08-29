@@ -1,9 +1,10 @@
 /**
  * The pages measured, in the lab and in the field.
  *
- * Targets are the Indonesian (/id-id/) pages: they carry the bulk of the
- * traffic, and CrUX shows them behaving very differently from the English ones
- * on phones.
+ * These three are the whole scope of the dashboard: the Indonesian (/id-id/)
+ * landing page, search results and a hotel detail page, each on mobile and
+ * desktop. Indonesian because that is where the traffic is, and because CrUX
+ * shows these pages behaving very differently from the English ones on phones.
  *
  * These were once richer - each target also carried the selectors for an
  * interaction to measure INP against, plus overlay dismissal and network
@@ -39,31 +40,3 @@ export const TARGETS = [
   },
 ];
 
-/**
- * Pages tracked in the field but never scanned in the lab.
- *
- * The English mirror of the scanned pages. Locale sits in the URL path, so CrUX
- * counts `/id-id/hotel` and `/en-id/hotel` as separate pages, and they are
- * nowhere near equivalent: on phones the Indonesian landing page reported an
- * LCP p75 around 9.9s against 2.8s for the English one over the same 28-day
- * window, while desktop was near identical on both. The lab scans Indonesian
- * because that is where the traffic is; English stays here as the reference
- * that made the gap visible in the first place.
- *
- * There is no English PDP scope: every en-id hotel page probed was below the
- * CrUX reporting threshold, so it would only ever render as "not published".
- */
-export const FIELD_ONLY_SCOPES = [
-  {
-    id: 'landing-en',
-    label: 'Hotel landing - English',
-    url: `${ORIGIN}/en-id/hotel`,
-  },
-  {
-    id: 'srp-en',
-    label: 'Hotel SRP - English',
-    // CrUX aggregates after dropping the query string, so the bare path is what
-    // it reports against; sending the full search URL would resolve here anyway.
-    url: `${ORIGIN}/en-id/hotel/search`,
-  },
-];

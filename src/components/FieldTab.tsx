@@ -191,12 +191,10 @@ export function FieldTab({ crux, range }: { crux: Crux; range: DateRange }) {
           )}
         </p>
         <p>
-          Locale is part of the path, so <code>/id-id/</code> and <code>/en-id/</code> are
-          separate pages to CrUX and are listed separately here. Treating them as one page
-          would be misleading: Indonesian carries the bulk of real traffic and has run several
-          seconds slower on phones for the same metric and window, while matching English on
-          desktop. The lab tab scans the Indonesian pages, so those rows line up with it; the
-          English rows are here as the reference that made the gap visible.
+          These are the same three pages the lab tab scans, so the two can be read against
+          each other directly. Expect the field numbers to be the kinder of the two: the lab
+          throttles every sample to a slow 4G phone, while this is the p75 of whatever
+          devices and connections real visitors actually had.
         </p>
         <p className="muted">
           Fetched {new Date(crux.fetchedAt).toLocaleDateString()}.
@@ -314,7 +312,7 @@ export function FieldTab({ crux, range }: { crux: Crux; range: DateRange }) {
 function ScopeUrl({ scope }: { scope: CruxScope }) {
   const url = scope.effectiveUrl ?? scope.requestedUrl;
   const normalised = scope.effectiveUrl != null && scope.effectiveUrl !== scope.requestedUrl;
-  const display = scope.kind === 'origin' ? 'origin-wide' : shortUrl(url);
+  const display = shortUrl(url);
 
   return (
     <a

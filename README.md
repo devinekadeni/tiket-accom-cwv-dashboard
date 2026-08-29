@@ -36,12 +36,19 @@ growing aggregate file on every run would put a full copy into git history each 
 | SRP | `/id-id/hotel/search?...&q=Jakarta` (no date params, so it cannot go stale) |
 | PDP | `/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-...` |
 
+These three pages on mobile and desktop are the entire scope, in both tabs: the lab tab scans
+them and the field tab reads CrUX for the same URLs, so the two can be compared row for row.
+
 The Indonesian pages, not the English ones. Locale is part of the path, so CrUX treats them as
 separate pages, and they behave very differently: Indonesian carries the bulk of real traffic and
 has run several seconds slower on phones for the same metric and window while matching English on
-desktop. The English landing and SRP remain in the field tab as the reference that made the gap
-visible. There is no English PDP scope, because no `/en-id/` hotel page clears CrUX's reporting
-threshold.
+desktop - the Indonesian landing page measured 7.08s LCP p75 against 2.63s for English, with
+desktop at 2.42s and 2.30s. The English pages were tracked alongside for a while to establish
+that; they are not any more, because the finding is recorded here and the dashboard is about the
+pages the team ships.
+
+The field tab also used to carry an origin-wide scope. It was dropped for the same reason: it
+blends flights and trains into the accommodation numbers.
 
 Mobile and desktop at PageSpeed Insights' own presets, five samples each, plotted as the median
 with the min/max spread behind it. The spread is not decoration - independent runs of the same

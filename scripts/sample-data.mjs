@@ -218,77 +218,47 @@ function cruxRecord(formFactor, scale, key, firstPopulated) {
 }
 
 // Mirrors what the real API returns, including the parts that look like bugs
-// and are not: the SRPs reported without their query string and populated in
-// only a handful of windows, the Indonesian PDP on phones only, and the
-// Indonesian landing page several times worse than its English twin on phones
-// while matching it on desktop.
+// and are not: the SRP reported without its query string and populated in only
+// a handful of windows, and the PDP published on phones but not on desktop.
 //
-// The first three ids match the lab targets, so those rows line up with the lab
-// tab; the -en scopes are field-only.
+// The ids match the lab targets, so every row lines up with the lab tab.
 //
 // `phone` and `desktop` are multipliers on CRUX_METRICS; null means the form
 // factor is not published. `from` is the first populated window out of 40.
 const CRUX_SCOPES = [
   {
-    id: 'origin',
-    label: 'All of tiket.com',
-    kind: 'origin',
-    url: ORIGIN,
-    phone: 1,
-    desktop: 0.6,
-    from: 0,
-  },
-  {
     id: 'landing',
-    label: 'Hotel landing - Indonesian',
+    label: 'Hotel landing',
     kind: 'url',
     url: `${ORIGIN}/id-id/hotel`,
     phone: 3.3,
     desktop: 0.58,
-    from: 5,
+    from: 3,
   },
   {
     id: 'srp',
-    label: 'Hotel SRP (Jakarta) - Indonesian',
+    label: 'Hotel SRP (Jakarta)',
     kind: 'url',
     url: `${ORIGIN}/id-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta`,
     matchedUrl: `${ORIGIN}/id-id/hotel/search`,
     phone: 3.4,
     desktop: 0.75,
-    from: 34,
+    from: 32,
   },
   {
     id: 'pdp',
-    label: 'Hotel PDP (Kempinski Jakarta) - Indonesian',
+    label: 'Hotel PDP (Kempinski Jakarta)',
     kind: 'url',
     url: `${ORIGIN}/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-108001534490372415`,
     phone: 1.9,
     desktop: null,
-    from: 28,
-  },
-  {
-    id: 'landing-en',
-    label: 'Hotel landing - English',
-    kind: 'url',
-    url: `${ORIGIN}/en-id/hotel`,
-    phone: 0.92,
-    desktop: 0.55,
-    from: 5,
-  },
-  {
-    id: 'srp-en',
-    label: 'Hotel SRP - English',
-    kind: 'url',
-    url: `${ORIGIN}/en-id/hotel/search`,
-    phone: 1.24,
-    desktop: 0.74,
-    from: 38,
+    from: 26,
   },
 ];
 
 const cruxRecords = {};
 for (const scope of CRUX_SCOPES) {
-  const key = scope.kind === 'origin' ? { origin: ORIGIN } : { url: scope.matchedUrl ?? scope.url };
+  const key = { url: scope.matchedUrl ?? scope.url };
   cruxRecords[scope.id] = {
     PHONE: scope.phone == null ? null : cruxRecord('PHONE', scope.phone, key, scope.from),
     DESKTOP: scope.desktop == null ? null : cruxRecord('DESKTOP', scope.desktop, key, scope.from),
