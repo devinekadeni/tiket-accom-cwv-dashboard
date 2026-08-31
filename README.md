@@ -149,10 +149,19 @@ commits `data/` wholesale.
    Both are already set. Changes take a few minutes to propagate, during which calls fail with a
    403 telling you to enable something that is already enabled; the scan retries those.
 
-2. **Cloudflare Pages.** Create a Pages project named `tiket-accom-cwv`, then set
-   `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` as repo secrets. The deploy step skips
-   itself while the token is absent, and the built site is uploaded as an artifact regardless.
-   Point `tiket-accom-cwv.devinekadeni.com` at the project for automatic TLS.
+2. **Cloudflare Pages.** The project exists and is live at
+   <https://tiket-accom-cwv.pages.dev>, deployed by hand with
+   `wrangler pages deploy dist --project-name=tiket-accom-cwv --branch=main`.
+
+   For the workflow to publish each run, set `CLOUDFLARE_API_TOKEN` (an account token with
+   *Cloudflare Pages: Edit*) and `CLOUDFLARE_ACCOUNT_ID` as repo secrets. Until then the deploy
+   step **skips silently** rather than failing, so a green run does not mean the site was
+   updated - the build is uploaded as an artifact either way.
+   ```bash
+   gh secret set CLOUDFLARE_API_TOKEN --repo devinekadeni/tiket-accom-cwv-dashboard
+   gh secret set CLOUDFLARE_ACCOUNT_ID --repo devinekadeni/tiket-accom-cwv-dashboard
+   ```
+   A custom domain is still to come; `*.pages.dev` carries its own TLS in the meantime.
 
 3. **Seed the trend.** Runs are keyed by date, so triggering the workflow twice in one day
    overwrites rather than accumulating. Let the schedule build the history, or pass `PERIOD` for a
