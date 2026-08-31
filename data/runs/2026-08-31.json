@@ -1,12 +1,12 @@
 {
   "period": "2026-08-31",
-  "runAt": "2026-08-31T08:07:39.055Z",
+  "runAt": "2026-08-31T16:21:07.732Z",
   "samples": 5,
   "source": "pagespeed-insights",
   "lighthouseVersion": "13.4.1",
   "runner": {
     "ci": "github-actions",
-    "commit": "105c51f4ea889a1b65d5e4ec62a7a8294b298f88"
+    "commit": "6c53800866be447f3558738e77cd88bba8ca5e1c"
   },
   "targets": {
     "landing": {
@@ -16,13 +16,13 @@
         "mobile": {
           "metrics": {
             "lcp": {
-              "median": 8309,
-              "min": 7555,
-              "max": 9641,
+              "median": 7785,
+              "min": 7669,
+              "max": 9815,
               "samples": 5
             },
             "cls": {
-              "median": 0,
+              "median": 0.0199,
               "min": 0,
               "max": 0.0203,
               "samples": 5
@@ -30,30 +30,30 @@
             "fcp": {
               "median": 2703,
               "min": 2703,
-              "max": 2704,
+              "max": 2703,
               "samples": 5
             },
             "ttfb": {
-              "median": 31,
-              "min": 4,
-              "max": 52,
+              "median": 42,
+              "min": 3,
+              "max": 45,
               "samples": 5
             },
             "tbt": {
-              "median": 990,
-              "min": 645,
-              "max": 1547,
+              "median": 1227,
+              "min": 649,
+              "max": 3178,
               "samples": 5
             },
             "speedIndex": {
-              "median": 7224,
-              "min": 5269,
-              "max": 8766,
+              "median": 7814,
+              "min": 5685,
+              "max": 11900,
               "samples": 5
             },
             "perfScore": {
-              "median": 42,
-              "min": 38,
+              "median": 41,
+              "min": 33,
               "max": 50,
               "samples": 5
             }
@@ -66,45 +66,45 @@
         "desktop": {
           "metrics": {
             "lcp": {
-              "median": 2163,
-              "min": 2052,
-              "max": 2330,
+              "median": 2265,
+              "min": 2028,
+              "max": 2376,
               "samples": 5
             },
             "cls": {
-              "median": 0.0014,
+              "median": 0.0013,
               "min": 0.0008,
-              "max": 0.0088,
+              "max": 0.0014,
               "samples": 5
             },
             "fcp": {
-              "median": 809,
-              "min": 802,
+              "median": 850,
+              "min": 810,
               "max": 851,
               "samples": 5
             },
             "ttfb": {
-              "median": 771,
-              "min": 496,
-              "max": 1040,
+              "median": 795,
+              "min": 115,
+              "max": 916,
               "samples": 5
             },
             "tbt": {
-              "median": 897,
-              "min": 733,
-              "max": 1786,
+              "median": 1502,
+              "min": 498,
+              "max": 4431,
               "samples": 5
             },
             "speedIndex": {
-              "median": 3505,
-              "min": 2937,
-              "max": 4322,
+              "median": 4161,
+              "min": 3019,
+              "max": 6710,
               "samples": 5
             },
             "perfScore": {
-              "median": 52,
-              "min": 49,
-              "max": 54,
+              "median": 50,
+              "min": 48,
+              "max": 57,
               "samples": 5
             }
           },
@@ -122,94 +122,99 @@
         "mobile": {
           "metrics": {
             "lcp": {
-              "median": 22902,
-              "min": 20793,
-              "max": 23818,
-              "samples": 5
+              "median": 23505,
+              "min": 20884,
+              "max": 26163,
+              "samples": 4
             },
             "cls": {
-              "median": 0.4252,
-              "min": 0.2913,
-              "max": 0.4351,
-              "samples": 5
+              "median": 0.2882,
+              "min": 0.2874,
+              "max": 0.3217,
+              "samples": 4
             },
             "fcp": {
               "median": 2703,
-              "min": 2703,
+              "min": 1952,
               "max": 2703,
-              "samples": 5
+              "samples": 4
             },
             "ttfb": {
-              "median": 36,
-              "min": 5,
-              "max": 48,
-              "samples": 5
+              "median": 3,
+              "min": 2,
+              "max": 29,
+              "samples": 4
             },
             "tbt": {
-              "median": 1998,
-              "min": 1756,
-              "max": 3384,
-              "samples": 5
+              "median": 1632,
+              "min": 929,
+              "max": 2498,
+              "samples": 4
             },
             "speedIndex": {
-              "median": 15166,
-              "min": 14662,
-              "max": 16837,
-              "samples": 5
+              "median": 15044,
+              "min": 13890,
+              "max": 16378,
+              "samples": 4
             },
             "perfScore": {
-              "median": 15,
-              "min": 14,
-              "max": 19,
-              "samples": 5
+              "median": 22,
+              "min": 18,
+              "max": 24,
+              "samples": 4
             }
           },
           "inp": {},
           "context": null,
-          "sampleCount": 5,
-          "errors": []
+          "sampleCount": 4,
+          "errors": [
+            {
+              "sample": 2,
+              "message": "terminated"
+            }
+          ]
         },
         "desktop": {
           "metrics": {
             "lcp": {
-              "median": 5172,
-              "min": 4491,
-              "max": 6011,
+              "median": 5014,
+              "min": 4769,
+              "max": 7993,
               "samples": 5
             },
             "cls": {
-              "median": 0.1001,
-              "min": 0.0904,
-              "max": 0.1412,
+              "median": 0.1003,
+              "min": 0.1001,
+              "max": 0.1045,
               "samples": 5
             },
             "fcp": {
               "median": 809,
               "min": 768,
-              "max": 811,
+              "max": 809,
               "samples": 5
             },
             "ttfb": {
-              "median": 755,
+              "median": 146,
               "min": 97,
-              "max": 921,
+              "max": 942,
               "samples": 5
             },
             "tbt": {
-              "median": 1636,
-              "min": 815,
-              "max": 2122,
+              "median": 1076,
+              "min": 814,
+              "max": 4740,
               "samples": 5
             },
             "speedIndex": {
-              "median": 5172,
-              "min": 4484,
-              "max": 5487,
+              "median": 4927,
+              "min": 4290,
+              "max": 10087,
               "samples": 5
             },
             "perfScore": {
               "median": 34,
-              "min": 31,
+              "min": 32,
               "max": 38,
               "samples": 5
             }
@@ -228,45 +233,45 @@
         "mobile": {
           "metrics": {
             "lcp": {
-              "median": 11886,
-              "min": 11112,
-              "max": 12505,
+              "median": 10717,
+              "min": 9899,
+              "max": 12348,
               "samples": 5
             },
             "cls": {
-              "median": 0.0511,
-              "min": 0.0511,
+              "median": 0.0504,
+              "min": 0.0504,
               "max": 0.0511,
               "samples": 5
             },
             "fcp": {
               "median": 3766,
               "min": 3766,
-              "max": 3772,
+              "max": 3768,
               "samples": 5
             },
             "ttfb": {
-              "median": 310,
-              "min": 18,
-              "max": 350,
+              "median": 93,
+              "min": 30,
+              "max": 294,
               "samples": 5
             },
             "tbt": {
-              "median": 1754,
-              "min": 1546,
-              "max": 2123,
+              "median": 1598,
+              "min": 922,
+              "max": 5317,
               "samples": 5
             },
             "speedIndex": {
-              "median": 11615,
-              "min": 10440,
-              "max": 14985,
+              "median": 12524,
+              "min": 9467,
+              "max": 20209,
               "samples": 5
             },
             "perfScore": {
-              "median": 31,
-              "min": 30,
-              "max": 32,
+              "median": 32,
+              "min": 28,
+              "max": 38,
               "samples": 5
             }
           },
@@ -278,45 +283,45 @@
         "desktop": {
           "metrics": {
             "lcp": {
-              "median": 2707,
-              "min": 2462,
-              "max": 3026,
+              "median": 2676,
+              "min": 2416,
+              "max": 2780,
               "samples": 5
             },
             "cls": {
-              "median": 0.1752,
+              "median": 0.1635,
               "min": 0.1626,
-              "max": 0.22,
+              "max": 0.1704,
               "samples": 5
             },
             "fcp": {
-              "median": 931,
-              "min": 922,
-              "max": 971,
+              "median": 933,
+              "min": 931,
+              "max": 1129,
               "samples": 5
             },
             "ttfb": {
-              "median": 276,
-              "min": 247,
-              "max": 903,
+              "median": 891,
+              "min": 248,
+              "max": 1112,
               "samples": 5
             },
             "tbt": {
-              "median": 812,
-              "min": 770,
-              "max": 1050,
+              "median": 1794,
+              "min": 1105,
+              "max": 3180,
               "samples": 5
             },
             "speedIndex": {
-              "median": 4270,
-              "min": 4110,
-              "max": 4736,
+              "median": 6851,
+              "min": 4524,
+              "max": 9405,
               "samples": 5
             },
             "perfScore": {
-              "median": 39,
-              "min": 37,
-              "max": 42,
+              "median": 37,
+              "min": 36,
+              "max": 41,
               "samples": 5
             }
           },
