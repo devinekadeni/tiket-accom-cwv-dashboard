@@ -34,7 +34,7 @@ growing aggregate file on every run would put a full copy into git history each 
 | --- | --- |
 | Landing | `/id-id/hotel` |
 | SRP | `/id-id/hotel/search?...&q=Jakarta` (no date params, so it cannot go stale) |
-| PDP | `/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-...` |
+| PDP | `/id-id/hotel/indonesia/aston-anyer-beach-hotel-...` (the busiest detail page) |
 
 These three pages on mobile and desktop are the entire scope, in both tabs: the lab tab scans
 them and the field tab reads CrUX for the same URLs, so the two can be compared row for row.

@@ -292,8 +292,8 @@ function LabTab({ periods, labels, rows, groups, hidden, onToggle, samples }: La
           The field tab is. The spread is worth reading: repeat runs of the same page minutes
           apart have differed by several seconds, so treat a single run's move with caution.
           All three URLs are the Indonesian (<code>/id-id/</code>) pages, which carry the bulk
-          of real traffic; the English equivalents behave differently and appear in the field
-          tab for comparison.
+          of real traffic, and the field tab reads CrUX for the same three URLs, so the two
+          tabs can be compared row for row.
         </p>
       </div>
 

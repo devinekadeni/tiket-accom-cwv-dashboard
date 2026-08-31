@@ -52,8 +52,8 @@ const BASE = {
     },
   },
   pdp: {
-    label: 'Hotel PDP (Kempinski Jakarta)',
-    url: 'https://www.tiket.com/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-108001534490372415',
+    label: 'Hotel PDP (Aston Anyer Beach)',
+    url: 'https://www.tiket.com/id-id/hotel/indonesia/aston-anyer-beach-hotel-112001545187309377',
     mobile: {
       metrics: { lcp: 18371, cls: 0.122, fcp: 3228, ttfb: 1194, tbt: 1089, speedIndex: 9489, perfScore: 34 },
       inp: { 'see-room': 532 },
@@ -247,12 +247,12 @@ const CRUX_SCOPES = [
   },
   {
     id: 'pdp',
-    label: 'Hotel PDP (Kempinski Jakarta)',
+    label: 'Hotel PDP (Aston Anyer Beach)',
     kind: 'url',
-    url: `${ORIGIN}/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-108001534490372415`,
+    url: `${ORIGIN}/id-id/hotel/indonesia/aston-anyer-beach-hotel-112001545187309377`,
     phone: 1.9,
     desktop: null,
-    from: 26,
+    from: 21,
   },
 ];
 

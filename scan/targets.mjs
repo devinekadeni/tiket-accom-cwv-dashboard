@@ -31,12 +31,20 @@ export const TARGETS = [
   },
   {
     id: 'pdp',
-    label: 'Hotel PDP (Kempinski Jakarta)',
-    // Chosen because CrUX publishes it: it is the only tiket detail page found
-    // above the reporting threshold, so it is the one PDP where the lab number
-    // and the field number describe the same URL and can be read against each
-    // other. Every English PDP probed returns no field data at all.
-    url: `${ORIGIN}/id-id/hotel/indonesia/hotel-indonesia-kempinski-jakarta-108001534490372415`,
+    label: 'Hotel PDP (Aston Anyer Beach)',
+    // The busiest hotel detail page according to the SEO and product teams,
+    // which is the only sound basis for picking one: a PDP is a stand-in for
+    // thousands of near-identical pages, so it should be the one real users
+    // actually land on.
+    //
+    // It reports 19 of CrUX's 40 windows on phones and none on desktop. That is
+    // not a property of this URL. Seven PDPs were probed, including four
+    // five-star hotels in Jakarta's CBD, and only one had ever published desktop
+    // data at all - 2 windows, stale since April. Hotel traffic is spread across
+    // thousands of URLs and skews heavily mobile here, so no single detail page
+    // sustains a desktop record. PSI still measures desktop in the lab; it is
+    // only the field half of the PDP row that is phone-only.
+    url: `${ORIGIN}/id-id/hotel/indonesia/aston-anyer-beach-hotel-112001545187309377`,
   },
 ];
 
