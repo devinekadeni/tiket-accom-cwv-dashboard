@@ -38,8 +38,8 @@ const BASE = {
     },
   },
   srp: {
-    label: 'Hotel SRP (Jakarta)',
-    url: 'https://www.tiket.com/id-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta',
+    label: 'Hotel SRP (Bandung)',
+    url: 'https://www.tiket.com/id-id/hotel/search?room=1&adult=1&type=CITY&q=Bandung&label=CITY&id=bandung-108001534490276290',
     mobile: {
       metrics: { lcp: 21400, cls: 0.27, fcp: 1954, ttfb: 431, tbt: 1014, speedIndex: 11469, perfScore: 28 },
       inp: { 'open-filter-sheet': 256, 'open-sort-sheet': 152 },
@@ -237,9 +237,9 @@ const CRUX_SCOPES = [
   },
   {
     id: 'srp',
-    label: 'Hotel SRP (Jakarta)',
+    label: 'Hotel SRP (Bandung)',
     kind: 'url',
-    url: `${ORIGIN}/id-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta`,
+    url: `${ORIGIN}/id-id/hotel/search?room=1&adult=1&type=CITY&q=Bandung&label=CITY&id=bandung-108001534490276290`,
     matchedUrl: `${ORIGIN}/id-id/hotel/search`,
     phone: 3.4,
     desktop: 0.75,

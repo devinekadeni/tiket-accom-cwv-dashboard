@@ -25,9 +25,18 @@ export const TARGETS = [
   },
   {
     id: 'srp',
-    label: 'Hotel SRP (Jakarta)',
+    label: 'Hotel SRP (Bandung)',
+    // Bandung rather than Jakarta because it carries more search traffic.
+    //
+    // The destination only affects the lab half of this row. CrUX aggregates
+    // after dropping the query string, so every destination and date collapses
+    // into one record for /id-id/hotel/search - the field numbers here describe
+    // all hotel searches, not this one. Which destination is loaded still
+    // matters for the lab: the result set, its images and its ad slots are what
+    // actually get measured, so it should be a search real users run.
+    //
     // No date params, so the URL cannot go stale.
-    url: `${ORIGIN}/id-id/hotel/search?room=1&adult=1&id=jakarta-108001534490276204&type=REGION&q=Jakarta`,
+    url: `${ORIGIN}/id-id/hotel/search?room=1&adult=1&type=CITY&q=Bandung&label=CITY&id=bandung-108001534490276290`,
   },
   {
     id: 'pdp',

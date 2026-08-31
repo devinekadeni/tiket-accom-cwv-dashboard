@@ -33,11 +33,17 @@ growing aggregate file on every run would put a full copy into git history each 
 | Target | URL |
 | --- | --- |
 | Landing | `/id-id/hotel` |
-| SRP | `/id-id/hotel/search?...&q=Jakarta` (no date params, so it cannot go stale) |
+| SRP | `/id-id/hotel/search?...&q=Bandung` (no date params, so it cannot go stale) |
 | PDP | `/id-id/hotel/indonesia/aston-anyer-beach-hotel-...` (the busiest detail page) |
 
 These three pages on mobile and desktop are the entire scope, in both tabs: the lab tab scans
 them and the field tab reads CrUX for the same URLs, so the two can be compared row for row.
+
+One caveat on the SRP. CrUX drops the query string, so every destination and date collapses into a
+single record for `/id-id/hotel/search`: the field row describes all hotel searches, and changing
+the destination cannot change it. The destination does decide what the lab loads, which is why it is
+Bandung - the busiest search - though the page is slow whichever city you ask for. Bandung and
+Jakarta measured 18.0s and 16.4s LCP on mobile.
 
 The Indonesian pages, not the English ones. Locale is part of the path, so CrUX treats them as
 separate pages, and they behave very differently: Indonesian carries the bulk of real traffic and
