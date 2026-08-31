@@ -100,6 +100,13 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy dist --project-name=tiket-accom-cwv --branch=main
+          # The action installs its own wrangler, and infers the package manager
+          # from the lockfile - finding pnpm here. `pnpm add` then refuses to
+          # touch a workspace root without an explicit -w, which the action does
+          # not pass, so the step dies before it ever authenticates. npm has no
+          # such objection, and wrangler is the action's own tool rather than a
+          # dependency of this project, so it has no business in the lockfile.
+          packageManager: npm
 
       - name: Report scan failures
         if: steps.scan.outcome == 'failure' || steps.crux.outcome == 'failure'

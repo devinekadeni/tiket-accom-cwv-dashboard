@@ -185,9 +185,12 @@ export default function App() {
 
       <footer className="footer">
         <p>
-          Measured from a GitHub Actions runner in the US/Europe against an origin served from
-          South-East Asia, so absolute values read higher than they would locally. The
-          run-to-run trend is the meaningful part, since the vantage point is constant.
+          Lab values read far higher than what a visitor on a good connection experiences,
+          because every mobile sample is throttled to a slow 4G phone with the CPU slowed
+          fourfold, and Google runs it from infrastructure of its own choosing rather than from
+          Indonesia. Neither is a flaw: holding the conditions fixed is what makes one run
+          comparable with the next. Read the run-to-run trend here and the absolute numbers in
+          the field tab.
         </p>
         <p className="muted">Generated {new Date(history.generatedAt).toLocaleString()}.</p>
       </footer>
