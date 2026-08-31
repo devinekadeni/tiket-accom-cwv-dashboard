@@ -1,5 +1,6 @@
 import type { Point, Series } from '../types';
 import { LAB_METRICS, INP_METRIC, formatValue, rate, type MetricDef } from '../metrics';
+import type { PeriodLabels } from '../dates';
 
 type Row = {
   key: string;
@@ -12,11 +13,13 @@ type Props = {
   rows: Row[];
   /** The periods currently in range, oldest first. */
   periods: string[];
+  labels: PeriodLabels;
 };
 
 /** Latest run per series: value, delta against the previous run, and pass/fail. */
-export function SummaryGrid({ rows, periods }: Props) {
+export function SummaryGrid({ rows, periods, labels }: Props) {
   const interactions = [...new Set(rows.flatMap((row) => Object.keys(row.series.inp)))].sort();
+  const previous = periods[periods.length - 2] ?? null;
 
   return (
     <div className="summary-wrap">
@@ -44,10 +47,22 @@ export function SummaryGrid({ rows, periods }: Props) {
                 {row.label}
               </th>
               {LAB_METRICS.map((def) => (
-                <Cell key={def.key} def={def} points={row.series.metrics[def.key]} periods={periods} />
+                <Cell
+                  key={def.key}
+                  def={def}
+                  points={row.series.metrics[def.key]}
+                  periods={periods}
+                  previousLabel={previous ? labels.full(previous) : null}
+                />
               ))}
               {interactions.map((name) => (
-                <Cell key={name} def={INP_METRIC} points={row.series.inp[name]} periods={periods} />
+                <Cell
+                  key={name}
+                  def={INP_METRIC}
+                  points={row.series.inp[name]}
+                  periods={periods}
+                  previousLabel={previous ? labels.full(previous) : null}
+                />
               ))}
             </tr>
           ))}
@@ -61,10 +76,12 @@ function Cell({
   def,
   points,
   periods,
+  previousLabel,
 }: {
   def: Pick<MetricDef, 'unit' | 'good' | 'poor' | 'higherIsBetter'>;
   points?: Point[];
   periods: string[];
+  previousLabel: string | null;
 }) {
   const byPeriod = new Map((points ?? []).map((point) => [point.period, point]));
   const latest = byPeriod.get(periods[periods.length - 1] ?? '')?.median ?? null;
@@ -74,18 +91,35 @@ function Cell({
 
   const rating = rate(def, latest);
   const delta = previous == null ? null : latest - previous;
-  // The arrow shows which way the number moved; the colour shows whether that
-  // was an improvement, which is inverted for the performance score.
-  const worse = delta == null ? false : def.higherIsBetter ? delta < 0 : delta > 0;
+
+  if (delta == null || delta === 0) {
+    return (
+      <td className={`cell cell-${rating}`}>
+        <span className="cell-value">{formatValue(def.unit, latest)}</span>
+        {delta === 0 && <span className="cell-delta delta-flat">no change</span>}
+      </td>
+    );
+  }
+
+  // The arrow follows the number, so it points up whenever the value rose. The
+  // colour carries the judgement, because up is an improvement for the score and
+  // a regression for everything else.
+  const rose = delta > 0;
+  const better = def.higherIsBetter ? rose : !rose;
+  const magnitude = formatValue(def.unit, Math.abs(delta));
 
   return (
     <td className={`cell cell-${rating}`}>
       <span className="cell-value">{formatValue(def.unit, latest)}</span>
-      {delta != null && delta !== 0 && (
-        <span className={`cell-delta ${worse ? 'delta-worse' : 'delta-better'}`}>
-          {delta > 0 ? '▲' : '▼'} {formatValue(def.unit, Math.abs(delta))}
-        </span>
-      )}
+      <span
+        className={`cell-delta ${better ? 'delta-better' : 'delta-worse'}`}
+        title={`${magnitude} ${better ? 'better' : 'worse'}${
+          previousLabel ? ` than ${previousLabel}` : ''
+        }`}
+      >
+        <span aria-hidden="true">{rose ? '\u25B2' : '\u25BC'}</span> {magnitude}
+        <span className="visually-hidden"> {better ? 'better' : 'worse'}</span>
+      </span>
     </td>
   );
 }

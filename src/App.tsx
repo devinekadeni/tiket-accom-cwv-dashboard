@@ -13,6 +13,7 @@ import {
 } from './dates';
 import { useTheme } from './theme';
 import {
+  DEFAULT_TARGET_ID,
   LAB_METRICS,
   INP_METRIC,
   formFactorLabel,
@@ -21,6 +22,7 @@ import {
   seriesLabel,
 } from './metrics';
 import { MetricChart, type ChartSeries } from './components/MetricChart';
+import { Callout } from './components/Callout';
 import { ContextStrip } from './components/ContextStrip';
 import { SummaryGrid } from './components/SummaryGrid';
 import { FieldTab } from './components/FieldTab';
@@ -30,7 +32,7 @@ const history = historyJson as unknown as History;
 
 export default function App() {
   const [tab, setTab] = useState<'lab' | 'field'>('lab');
-  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  const [hidden, setHidden] = useState<Set<string>>(defaultHidden);
   const [range, setRange] = useState<DateRange>(DEFAULT_RANGE);
   const [theme, toggleTheme] = useTheme();
 
@@ -193,6 +195,20 @@ export default function App() {
   );
 }
 
+/**
+ * Everything except the default page starts hidden.
+ *
+ * Falls back to showing all of it if that page is missing from the data, which
+ * happens on the first run after a target is added or renamed - an empty chart
+ * with every chip switched off looks broken.
+ */
+function defaultHidden(): Set<string> {
+  const keys = history.series.map(seriesKey);
+  const preferred = history.series.filter((s) => s.targetId === DEFAULT_TARGET_ID);
+  if (preferred.length === 0) return new Set();
+  return new Set(keys.filter((key) => !key.startsWith(`${DEFAULT_TARGET_ID}|`)));
+}
+
 /** First and last date in the data, used to prefill the custom range inputs. */
 function dataBounds(ids: string[]): { from: string; to: string } {
   const dates = ids.map(parsePeriod).filter((d): d is Date => d != null);
@@ -247,7 +263,7 @@ function LabTab({ periods, labels, rows, groups, hidden, onToggle, samples }: La
               {group.rows.map((row) => (
                 <button
                   key={row.key}
-                  className={hidden.has(row.key) ? 'toggle toggle-off' : 'toggle'}
+                  className={hidden.has(row.key) ? 'toggle' : 'toggle toggle-selected'}
                   onClick={() => onToggle(row.key)}
                   aria-pressed={!hidden.has(row.key)}
                   aria-label={row.label}
@@ -261,8 +277,10 @@ function LabTab({ periods, labels, rows, groups, hidden, onToggle, samples }: La
         ))}
       </div>
 
-      <div className="callout">
-        <h2>How this data is collected</h2>
+      <Callout
+        title="How this data is collected"
+        summary="PageSpeed Insights runs Lighthouse twice a week; each point is the median of five samples."
+      >
         <p>
           Twice a week - early on Tuesday and Friday mornings, after each of the team's two
           deploy days - a GitHub Actions runner asks Google's PageSpeed Insights API to run
@@ -295,7 +313,7 @@ function LabTab({ periods, labels, rows, groups, hidden, onToggle, samples }: La
           of real traffic, and the field tab reads CrUX for the same three URLs, so the two
           tabs can be compared row for row.
         </p>
-      </div>
+      </Callout>
 
       {periods.length === 0 ? (
         <p className="empty">No scans in the selected range. Widen the date filter.</p>
@@ -303,10 +321,22 @@ function LabTab({ periods, labels, rows, groups, hidden, onToggle, samples }: La
         <>
           <h2>Latest run</h2>
           <p className="muted">
-            Value, change from the previous run, and rating against Google's thresholds. Runs
-            sit either side of a deploy window, so a change here contains one deploy.
+            {periods.length < 2 ? (
+              <>
+                Value and rating against Google's thresholds. This is the only run in range, so
+                there is nothing to compare it against yet - the next scan adds the change
+                against this one.
+              </>
+            ) : (
+              <>
+                Value, change from the previous run, and rating against Google's thresholds. The
+                arrow follows the number and its colour says whether that was an improvement, so
+                green down means faster and green up means a higher score. Runs sit either side
+                of a deploy window, so a change here contains one deploy.
+              </>
+            )}
           </p>
-          <SummaryGrid rows={rows} periods={periods} />
+          <SummaryGrid rows={rows} periods={periods} labels={labels} />
 
           <h2>Interactions</h2>
           {interactions.length === 0 ? (

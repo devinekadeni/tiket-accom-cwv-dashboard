@@ -107,9 +107,17 @@ export function seriesKey(series: Pick<Series, 'targetId' | 'formFactor'>): stri
 }
 
 /**
- * One hue per target so the three pages stay distinguishable, with desktop as
- * the lighter shade of the same hue.
+ * The page shown when the dashboard first loads, on both tabs.
+ *
+ * Six lines at once is a thicket, and the three pages sit far enough apart that
+ * a shared axis flattens whichever is fastest. Starting on one page and one
+ * comparison - the same page on desktop against mobile - makes the opening view
+ * readable; the others are one chip away.
+ *
+ * The detail page, because it is where the most sessions land.
  */
+export const DEFAULT_TARGET_ID = 'pdp';
+
 /**
  * One hue per page, the darker shade for mobile. The same page keeps its colour
  * across both tabs, so a line means the same thing in the lab and in the field.

@@ -12,8 +12,9 @@ import {
 
 import type { Crux, CruxScope } from '../types';
 import { buildPeriodLabels, filterPeriods, type DateRange } from '../dates';
-import { formFactorLabel, formatValue, seriesColor } from '../metrics';
+import { DEFAULT_TARGET_ID, formFactorLabel, formatValue, seriesColor } from '../metrics';
 import { AXIS_WIDTH, ThresholdTick, buildTicks, thresholdsCrowded } from './ThresholdAxis';
+import { Callout } from './Callout';
 
 /** CrUX metric ids mapped to labels and the thresholds they are judged against. */
 const FIELD_METRICS: Record<
@@ -62,8 +63,19 @@ function coverageOf(scope: CruxScope): { reported: number; total: number } {
   return { reported: reported.size, total: periods.size };
 }
 
+/** Matches the lab tab: only the default page is on when the tab first opens. */
+function defaultHidden(crux: Crux): Set<string> {
+  if (!crux) return new Set();
+  const keys = crux.scopes.flatMap((scope) =>
+    formFactorsOf(scope).map((formFactor) => seriesKeyFor(scope.id, formFactor))
+  );
+  const preferred = keys.filter((key) => key.startsWith(`${DEFAULT_TARGET_ID}|`));
+  if (preferred.length === 0) return new Set();
+  return new Set(keys.filter((key) => !preferred.includes(key)));
+}
+
 export function FieldTab({ crux, range }: { crux: Crux; range: DateRange }) {
-  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  const [hidden, setHidden] = useState<Set<string>>(() => defaultHidden(crux));
 
   if (!crux) {
     return (
@@ -121,34 +133,60 @@ export function FieldTab({ crux, range }: { crux: Crux; range: DateRange }) {
               <Coverage scope={scope} />
             </span>
             <div className="toggle-group-chips">
-              {formFactorsOf(scope).map((formFactor) => {
+              {FORM_FACTOR_ORDER.map((formFactor) => {
                 const key = seriesKeyFor(scope.id, formFactor);
+                const swatch = (
+                  <span className="swatch" style={{ background: colorFor(scope.id, formFactor) }} />
+                );
+
+                // Kept in the row rather than dropped, so the gap is explained
+                // where the reader is looking for the chip.
+                if (!scope.formFactors[formFactor]) {
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      className="toggle toggle-unavailable"
+                      // aria-disabled rather than disabled: a disabled button
+                      // takes no pointer events in some browsers, which would
+                      // swallow the very tooltip that explains it.
+                      aria-disabled="true"
+                      onClick={(event) => event.preventDefault()}
+                      title={unavailableReason(scope, formFactor)}
+                      // Without this the label and the note run together into
+                      // "Desktopno data" when read aloud.
+                      aria-label={`${scope.label} - ${formFactor.toLowerCase()}, no field data`}
+                    >
+                      {swatch}
+                      {formFactorLabel(formFactor.toLowerCase())}
+                      <span className="toggle-note">no data</span>
+                    </button>
+                  );
+                }
+
                 return (
                   <button
                     key={key}
-                    className={hidden.has(key) ? 'toggle toggle-off' : 'toggle'}
+                    type="button"
+                    className={hidden.has(key) ? 'toggle' : 'toggle toggle-selected'}
                     onClick={() => toggle(key)}
                     aria-pressed={!hidden.has(key)}
                     aria-label={`${scope.label} - ${formFactor.toLowerCase()}`}
                   >
-                    <span
-                      className="swatch"
-                      style={{ background: colorFor(scope.id, formFactor) }}
-                    />
+                    {swatch}
                     {formFactorLabel(formFactor.toLowerCase())}
                   </button>
                 );
               })}
-              {formFactorsOf(scope).length === 0 && (
-                <span className="muted">not published by CrUX</span>
-              )}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="callout">
-        <h2>How this data is collected</h2>
+      <Callout
+        title="How this data is collected"
+        summary="Real Chrome users, p75 over a 28-day rolling window, read from CrUX. Nothing here is measured by this repo."
+      >
         <p>
           Chrome UX Report p75: real Chrome users who opted into reporting, aggregated by Google
           over a <strong>28-day rolling window</strong> and split by phone and desktop. Nothing
@@ -199,7 +237,7 @@ export function FieldTab({ crux, range }: { crux: Crux; range: DateRange }) {
         <p className="muted">
           Fetched {new Date(crux.fetchedAt).toLocaleDateString()}.
         </p>
-      </div>
+      </Callout>
 
       {periods.length === 0 && (
         <p className="empty">No field data in the selected range. Widen the date filter.</p>
@@ -349,6 +387,27 @@ function Coverage({ scope }: { scope: CruxScope }) {
 
 function formFactorsOf(scope: CruxScope): string[] {
   return FORM_FACTOR_ORDER.filter((formFactor) => scope.formFactors[formFactor]);
+}
+
+/**
+ * Why a form factor has no chip to click.
+ *
+ * Absence here is a fact about the page, not a fault in the dashboard: CrUX
+ * withholds a URL until it has enough traffic on that device, so an empty
+ * desktop row usually means almost nobody visits that page on a desktop. Worth
+ * saying explicitly, because the alternative reading - that the page is fine on
+ * desktop - is the opposite of what the data supports.
+ */
+function unavailableReason(scope: CruxScope, formFactor: string): string {
+  const device = formFactor === 'PHONE' ? 'phone' : 'desktop';
+  const url = scope.effectiveUrl ?? scope.requestedUrl;
+  return (
+    `No ${device} field data. CrUX only publishes a URL once it has enough ${device} ` +
+    `visits from opted-in Chrome users within the 28-day window, and ${url} has not ` +
+    `cleared that bar on ${device} in any of the windows Google returns. It is not a ` +
+    `gap in this dashboard, and it says nothing about how fast the page is - the lab ` +
+    `tab measures ${device} for this page regardless.`
+  );
 }
 
 function seriesKeyFor(scopeId: string, formFactor: string): string {
