@@ -13,5 +13,8 @@ src/generated/
 # Fabricated preview data from `pnpm run sample`. Never real measurements.
 data/sample/
 
+# wrangler's scratch directory, written by `pages deploy`.
+.wrangler/
+
 .DS_Store
 *.log

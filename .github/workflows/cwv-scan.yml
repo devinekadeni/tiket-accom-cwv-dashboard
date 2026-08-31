@@ -41,9 +41,13 @@ jobs:
 
       - uses: pnpm/action-setup@v4
 
+      # 22, not 20: current wrangler refuses to start on anything older, and
+      # the runners are phasing Node 20 out regardless. Nothing here is
+      # version-sensitive - the scan only makes HTTP calls, and the numbers are
+      # measured on Google's machines, not this one.
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
@@ -90,23 +94,21 @@ jobs:
           path: dist/
           retention-days: 14
 
+      # cloudflare/wrangler-action is not used: it insists on installing
+      # wrangler into the checkout, and no package manager will have it here.
+      # `pnpm add` refuses to touch a workspace root without an explicit -w,
+      # which the action does not pass; npm gets as far as reading pnpm's
+      # node_modules layout, cannot make a flat tree of it, and exits ERESOLVE
+      # over peers it invented. `dlx` fetches wrangler into a temp store
+      # instead, which is where a one-off tool belongs - it is the action's own
+      # dependency, not this project's, and has no business in the lockfile.
       - name: Deploy to Cloudflare Pages
         id: deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         if: env.CLOUDFLARE_API_TOKEN != ''
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=tiket-accom-cwv --branch=main
-          # The action installs its own wrangler, and infers the package manager
-          # from the lockfile - finding pnpm here. `pnpm add` then refuses to
-          # touch a workspace root without an explicit -w, which the action does
-          # not pass, so the step dies before it ever authenticates. npm has no
-          # such objection, and wrangler is the action's own tool rather than a
-          # dependency of this project, so it has no business in the lockfile.
-          packageManager: npm
+        run: pnpm dlx wrangler@4 pages deploy dist --project-name=tiket-accom-cwv --branch=main
 
       - name: Report scan failures
         if: steps.scan.outcome == 'failure' || steps.crux.outcome == 'failure'
