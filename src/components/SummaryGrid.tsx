@@ -1,5 +1,5 @@
 import type { Point, Series } from '../types';
-import { LAB_METRICS, INP_METRIC, formatValue, rate, type MetricDef } from '../metrics';
+import { LAB_METRICS, INP_METRIC, formatPercent, formatValue, rate, type MetricDef } from '../metrics';
 import type { PeriodLabels } from '../dates';
 
 type Row = {
@@ -90,16 +90,17 @@ function Cell({
   if (latest == null) return <td className="cell-empty">-</td>;
 
   const rating = rate(def, latest);
-  const delta = previous == null ? null : latest - previous;
 
-  if (delta == null || delta === 0) {
+  if (previous == null || latest === previous) {
     return (
       <td className={`cell cell-${rating}`}>
         <span className="cell-value">{formatValue(def.unit, latest)}</span>
-        {delta === 0 && <span className="cell-delta delta-flat">no change</span>}
+        {previous != null && <span className="cell-delta delta-flat">no change</span>}
       </td>
     );
   }
+
+  const delta = latest - previous;
 
   // The arrow follows the number, so it points up whenever the value rose. The
   // colour carries the judgement, because up is an improvement for the score and
@@ -107,17 +108,20 @@ function Cell({
   const rose = delta > 0;
   const better = def.higherIsBetter ? rose : !rose;
   const magnitude = formatValue(def.unit, Math.abs(delta));
+  const percent = formatPercent(delta, previous);
+  const change = percent ? `${magnitude} (${percent})` : magnitude;
 
   return (
     <td className={`cell cell-${rating}`}>
       <span className="cell-value">{formatValue(def.unit, latest)}</span>
       <span
         className={`cell-delta ${better ? 'delta-better' : 'delta-worse'}`}
-        title={`${magnitude} ${better ? 'better' : 'worse'}${
+        title={`${change} ${better ? 'better' : 'worse'}${
           previousLabel ? ` than ${previousLabel}` : ''
         }`}
       >
         <span aria-hidden="true">{rose ? '\u25B2' : '\u25BC'}</span> {magnitude}
+        {percent && <span className="cell-percent"> ({percent})</span>}
         <span className="visually-hidden"> {better ? 'better' : 'worse'}</span>
       </span>
     </td>

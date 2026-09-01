@@ -102,6 +102,24 @@ export function formatValue(unit: MetricDef['unit'], value: number | null): stri
   return value.toFixed(3);
 }
 
+/**
+ * A change as a share of what it is measured against, which is the part the
+ * absolute figure hides: 10ms is noise on a 3s LCP and a third of a fast TTFB.
+ *
+ * Signed to match the raw delta rather than the judgement, so the sign, the
+ * arrow and the number always agree and only the colour says whether it is good
+ * news. Null where a percentage would mislead: against a zero baseline there is
+ * no share to take, and below a tenth of a percent the rounding says more about
+ * the arithmetic than the run.
+ */
+export function formatPercent(delta: number, previous: number): string | null {
+  if (previous <= 0) return null;
+  const pct = (delta / previous) * 100;
+  const magnitude = Math.abs(pct);
+  if (magnitude < 0.05) return null;
+  return `${pct > 0 ? '+' : '-'}${magnitude.toFixed(magnitude < 10 ? 1 : 0)}%`;
+}
+
 export function seriesKey(series: Pick<Series, 'targetId' | 'formFactor'>): string {
   return `${series.targetId}|${series.formFactor}`;
 }

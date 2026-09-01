@@ -390,6 +390,11 @@ code {
   font-size: 11px;
 }
 
+/* Dimmed so the reading stays the headline and the share stays the footnote. */
+.cell-percent {
+  opacity: 0.75;
+}
+
 .delta-worse {
   color: var(--poor);
 }
