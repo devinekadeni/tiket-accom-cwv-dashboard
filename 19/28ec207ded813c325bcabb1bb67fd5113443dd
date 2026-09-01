@@ -1,0 +1,26 @@
+src/metrics.ts
+  s_505c4ec3017ece::t_9810362cee5715 105-122
+src/components/SummaryGrid.tsx
+  s_505c4ec3017ece::t_f9f9174cfdbe07 94,98,103
+  s_505c4ec3017ece::t_fab595fb08f9f0 111-112,119,124
+  s_505c4ec3017ece::t_7b26a4a4711b6b 2
+  s_505c4ec3017ece::t_54aeb941d5ae35 104
+src/styles.css
+  s_505c4ec3017ece::t_29ce2b6cf0a756 393-397
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "1928ec207ded813c325bcabb1bb67fd5113443dd",
+  "prompts": {},
+  "sessions": {
+    "s_505c4ec3017ece": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "f71b19a7-168c-4f4b-bbe8-e546fe6c0a1c",
+        "model": "claude-opus-5"
+      },
+      "human_author": "Devin Ekadeni <devinekadeni@gmail.com>"
+    }
+  }
+}
