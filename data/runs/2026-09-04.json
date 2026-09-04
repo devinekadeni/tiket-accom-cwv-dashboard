@@ -1,0 +1,346 @@
+{
+  "period": "2026-09-04",
+  "runAt": "2026-09-03T23:19:22.750Z",
+  "samples": 5,
+  "source": "pagespeed-insights",
+  "lighthouseVersion": "13.4.1",
+  "runner": {
+    "ci": "github-actions",
+    "commit": "21eab1ec0109e1344ea1254defcda99894275621"
+  },
+  "targets": {
+    "landing": {
+      "label": "Hotel landing",
+      "url": "https://www.tiket.com/id-id/hotel",
+      "formFactors": {
+        "mobile": {
+          "metrics": {
+            "lcp": {
+              "median": 7864,
+              "min": 7767,
+              "max": 8478,
+              "samples": 4
+            },
+            "cls": {
+              "median": 0.0199,
+              "min": 0,
+              "max": 0.0199,
+              "samples": 4
+            },
+            "fcp": {
+              "median": 2704,
+              "min": 2703,
+              "max": 2705,
+              "samples": 4
+            },
+            "ttfb": {
+              "median": 21,
+              "min": 3,
+              "max": 49,
+              "samples": 4
+            },
+            "tbt": {
+              "median": 1497,
+              "min": 625,
+              "max": 2411,
+              "samples": 4
+            },
+            "speedIndex": {
+              "median": 7604,
+              "min": 4329,
+              "max": 10348,
+              "samples": 4
+            },
+            "perfScore": {
+              "median": 39,
+              "min": 34,
+              "max": 53,
+              "samples": 4
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 4,
+          "errors": [
+            {
+              "sample": 2,
+              "message": "landing/mobile #2: Lighthouse returned error: Something went wrong."
+            }
+          ]
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 2368,
+              "min": 1995,
+              "max": 2446,
+              "samples": 4
+            },
+            "cls": {
+              "median": 0.0039,
+              "min": 0.0008,
+              "max": 0.008,
+              "samples": 4
+            },
+            "fcp": {
+              "median": 830,
+              "min": 809,
+              "max": 932,
+              "samples": 4
+            },
+            "ttfb": {
+              "median": 638,
+              "min": 223,
+              "max": 649,
+              "samples": 4
+            },
+            "tbt": {
+              "median": 2376,
+              "min": 845,
+              "max": 4578,
+              "samples": 4
+            },
+            "speedIndex": {
+              "median": 4370,
+              "min": 3013,
+              "max": 6628,
+              "samples": 4
+            },
+            "perfScore": {
+              "median": 49,
+              "min": 47,
+              "max": 53,
+              "samples": 4
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 4,
+          "errors": [
+            {
+              "sample": 1,
+              "message": "landing/desktop #1: Lighthouse returned error: Something went wrong."
+            }
+          ]
+        }
+      }
+    },
+    "srp": {
+      "label": "Hotel SRP (Bandung)",
+      "url": "https://www.tiket.com/id-id/hotel/search?room=1&adult=1&type=CITY&q=Bandung&label=CITY&id=bandung-108001534490276290",
+      "formFactors": {
+        "mobile": {
+          "metrics": {
+            "lcp": {
+              "median": 22460,
+              "min": 17360,
+              "max": 29883,
+              "samples": 4
+            },
+            "cls": {
+              "median": 0.2913,
+              "min": 0.2902,
+              "max": 0.4133,
+              "samples": 4
+            },
+            "fcp": {
+              "median": 2703,
+              "min": 2703,
+              "max": 2703,
+              "samples": 4
+            },
+            "ttfb": {
+              "median": 12,
+              "min": 9,
+              "max": 37,
+              "samples": 4
+            },
+            "tbt": {
+              "median": 2714,
+              "min": 934,
+              "max": 6451,
+              "samples": 4
+            },
+            "speedIndex": {
+              "median": 15662,
+              "min": 13612,
+              "max": 22903,
+              "samples": 4
+            },
+            "perfScore": {
+              "median": 17,
+              "min": 13,
+              "max": 25,
+              "samples": 4
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 4,
+          "errors": [
+            {
+              "sample": 1,
+              "message": "srp/mobile #1: Lighthouse returned error: Something went wrong."
+            }
+          ]
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 6534,
+              "min": 3837,
+              "max": 8154,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.1002,
+              "min": 0.0922,
+              "max": 0.1086,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 809,
+              "min": 768,
+              "max": 810,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 710,
+              "min": 646,
+              "max": 902,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 2362,
+              "min": 832,
+              "max": 3931,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 7626,
+              "min": 4633,
+              "max": 8134,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 33,
+              "min": 32,
+              "max": 39,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 5,
+          "errors": []
+        }
+      }
+    },
+    "pdp": {
+      "label": "Hotel PDP (Aston Anyer Beach)",
+      "url": "https://www.tiket.com/id-id/hotel/indonesia/aston-anyer-beach-hotel-112001545187309377",
+      "formFactors": {
+        "mobile": {
+          "metrics": {
+            "lcp": {
+              "median": 11934,
+              "min": 10003,
+              "max": 12403,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.0504,
+              "min": 0.0417,
+              "max": 0.0511,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 3615,
+              "min": 3465,
+              "max": 3615,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 85,
+              "min": 12,
+              "max": 323,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 1326,
+              "min": 601,
+              "max": 4632,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 9663,
+              "min": 8291,
+              "max": 22293,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 34,
+              "min": 28,
+              "max": 44,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 5,
+          "errors": []
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 2907,
+              "min": 2471,
+              "max": 3600,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.1676,
+              "min": 0.1431,
+              "max": 0.2585,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 934,
+              "min": 929,
+              "max": 1012,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 769,
+              "min": 128,
+              "max": 860,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 2248,
+              "min": 525,
+              "max": 6677,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 8083,
+              "min": 3500,
+              "max": 15821,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 36,
+              "min": 29,
+              "max": 50,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 5,
+          "errors": []
+        }
+      }
+    }
+  }
+}
