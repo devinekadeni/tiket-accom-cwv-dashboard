@@ -1,0 +1,331 @@
+{
+  "period": "2026-09-29",
+  "runAt": "2026-09-29T01:02:12.282Z",
+  "samples": 5,
+  "source": "pagespeed-insights",
+  "lighthouseVersion": "13.5.0",
+  "runner": {
+    "ci": "github-actions",
+    "commit": "240e93b86d14075c990322aa997d0d521edd7653"
+  },
+  "targets": {
+    "landing": {
+      "label": "Hotel landing",
+      "url": "https://www.tiket.com/id-id/hotel",
+      "formFactors": {
+        "mobile": {
+          "metrics": {
+            "lcp": {
+              "median": 5636,
+              "min": 3828,
+              "max": 5725,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.0081,
+              "min": 0.0081,
+              "max": 0.0081,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 2703,
+              "min": 2703,
+              "max": 2704,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 3,
+              "min": 2,
+              "max": 37,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 2107,
+              "min": 983,
+              "max": 2505,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 10357,
+              "min": 8817,
+              "max": 11207,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 44,
+              "min": 38,
+              "max": 47,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 5,
+          "errors": []
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 1548,
+              "min": 1182,
+              "max": 2127,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.0006,
+              "min": 0.0005,
+              "max": 0.0006,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 850,
+              "min": 810,
+              "max": 851,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 913,
+              "min": 96,
+              "max": 1221,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 1736,
+              "min": 1058,
+              "max": 2198,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 4259,
+              "min": 3487,
+              "max": 5267,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 56,
+              "min": 49,
+              "max": 58,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 5,
+          "errors": []
+        }
+      }
+    },
+    "srp": {
+      "label": "Hotel SRP (Bandung)",
+      "url": "https://www.tiket.com/id-id/hotel/search?room=1&adult=1&type=CITY&q=Bandung&label=CITY&id=bandung-108001534490276290",
+      "formFactors": {
+        "mobile": {
+          "metrics": {
+            "lcp": {
+              "median": 23519,
+              "min": 20028,
+              "max": 24995,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.0089,
+              "min": 0.0089,
+              "max": 0.0192,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 2703,
+              "min": 1952,
+              "max": 2703,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 52,
+              "min": 3,
+              "max": 87,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 2346,
+              "min": 931,
+              "max": 3288,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 13788,
+              "min": 12795,
+              "max": 18310,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 33,
+              "min": 32,
+              "max": 43,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 5,
+          "errors": []
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 4835,
+              "min": 4688,
+              "max": 6077,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.0125,
+              "min": 0.0099,
+              "max": 0.0128,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 809,
+              "min": 730,
+              "max": 850,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 902,
+              "min": 96,
+              "max": 970,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 1542,
+              "min": 493,
+              "max": 1882,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 4701,
+              "min": 3781,
+              "max": 6079,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 37,
+              "min": 36,
+              "max": 47,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 5,
+          "errors": []
+        }
+      }
+    },
+    "pdp": {
+      "label": "Hotel PDP (Aston Anyer Beach)",
+      "url": "https://www.tiket.com/id-id/hotel/indonesia/aston-anyer-beach-hotel-112001545187309377",
+      "formFactors": {
+        "mobile": {
+          "metrics": {
+            "lcp": {
+              "median": 10311,
+              "min": 5252,
+              "max": 10776,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.041,
+              "min": 0.041,
+              "max": 0.0417,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 3766,
+              "min": 3615,
+              "max": 3773,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 331,
+              "min": 8,
+              "max": 345,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 1548,
+              "min": 1295,
+              "max": 3041,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 11425,
+              "min": 10406,
+              "max": 16655,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 32,
+              "min": 31,
+              "max": 34,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 5,
+          "errors": []
+        },
+        "desktop": {
+          "metrics": {
+            "lcp": {
+              "median": 2017,
+              "min": 1342,
+              "max": 2249,
+              "samples": 5
+            },
+            "cls": {
+              "median": 0.0546,
+              "min": 0.0482,
+              "max": 0.0609,
+              "samples": 5
+            },
+            "fcp": {
+              "median": 1012,
+              "min": 870,
+              "max": 1012,
+              "samples": 5
+            },
+            "ttfb": {
+              "median": 795,
+              "min": 225,
+              "max": 938,
+              "samples": 5
+            },
+            "tbt": {
+              "median": 1318,
+              "min": 723,
+              "max": 4168,
+              "samples": 5
+            },
+            "speedIndex": {
+              "median": 4649,
+              "min": 3790,
+              "max": 9231,
+              "samples": 5
+            },
+            "perfScore": {
+              "median": 50,
+              "min": 47,
+              "max": 55,
+              "samples": 5
+            }
+          },
+          "inp": {},
+          "context": null,
+          "sampleCount": 5,
+          "errors": []
+        }
+      }
+    }
+  }
+}
